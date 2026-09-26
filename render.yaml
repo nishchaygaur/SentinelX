@@ -1,0 +1,31 @@
+# ==============================================================================
+# SentinelX Render Deployment Blueprint
+# Deploys the Node.js/Express SOC backend as a managed Web Service on Render
+# ==============================================================================
+
+services:
+  - type: web
+    name: sentinelx-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false # Configured in Render Dashboard with Supabase URI
+      - key: CORS_ORIGIN
+        sync: false # Configured with your Vercel frontend domain (e.g. https://sentinelx.vercel.app)
+      - key: OPENROUTER_API_KEY
+        sync: false # Secret key for OpenRouter AI
+      - key: OPENROUTER_MODEL
+        value: openrouter/free
+      - key: LOG_INGESTION_TOKEN
+        sync: false # Token shared with Ubuntu VM log collector

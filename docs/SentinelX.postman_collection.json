@@ -1,0 +1,316 @@
+{
+  "info": {
+    "_postman_id": "sentinelx-soc-api-collection",
+    "name": "SentinelX SOC Platform API",
+    "description": "Comprehensive Postman collection for SentinelX Autonomous AI-Powered Security Operations Center & Threat Intelligence Platform.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "incidentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "alertId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Incidents",
+      "item": [
+        {
+          "name": "Generate Random Incident",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/incidents/generate-random",
+              "host": ["{{baseUrl}}"],
+              "path": ["incidents", "generate-random"]
+            },
+            "description": "Generates a realistic simulated cybersecurity incident across 15 real attack scenarios and persists it to PostgreSQL."
+          }
+        },
+        {
+          "name": "Get All Incidents",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/incidents",
+              "host": ["{{baseUrl}}"],
+              "path": ["incidents"]
+            },
+            "description": "Retrieves all incidents ordered by ID descending."
+          }
+        },
+        {
+          "name": "Get Incident by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/incidents/{{incidentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["incidents", "{{incidentId}}"]
+            },
+            "description": "Retrieves complete incident details including correlated alerts, logs, and response actions."
+          }
+        },
+        {
+          "name": "Update Incident Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"investigating\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/incidents/{{incidentId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["incidents", "{{incidentId}}", "status"]
+            },
+            "description": "Updates the lifecycle status of an incident (open, investigating, containment, remediation, resolved)."
+          }
+        },
+        {
+          "name": "Update Incident Details",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assigned_to\": \"Lead Analyst\",\n  \"investigation_notes\": \"Observed lateral movement indicators; host quarantined.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/incidents/{{incidentId}}/details",
+              "host": ["{{baseUrl}}"],
+              "path": ["incidents", "{{incidentId}}", "details"]
+            },
+            "description": "Updates assignee and analyst investigation notes for an incident."
+          }
+        },
+        {
+          "name": "Get Incident Timeline",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/incidents/{{incidentId}}/timeline",
+              "host": ["{{baseUrl}}"],
+              "path": ["incidents", "{{incidentId}}", "timeline"]
+            },
+            "description": "Retrieves the chronological audit timeline of events for an incident."
+          }
+        },
+        {
+          "name": "Add Incident Timeline Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_type\": \"investigation\",\n  \"event_title\": \"Forensic memory dump extracted\",\n  \"event_description\": \"Volatility memory analysis confirmed presence of inject payload.\",\n  \"severity\": \"high\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/incidents/{{incidentId}}/timeline",
+              "host": ["{{baseUrl}}"],
+              "path": ["incidents", "{{incidentId}}", "timeline"]
+            },
+            "description": "Appends a new timeline milestone or investigation event to the incident."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Get Incident Consolidated Report (JSON)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/incidents/{{incidentId}}/report",
+              "host": ["{{baseUrl}}"],
+              "path": ["incidents", "{{incidentId}}", "report"]
+            },
+            "description": "Returns full consolidated incident report payload in JSON format."
+          }
+        },
+        {
+          "name": "Download Incident PDF Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/incidents/{{incidentId}}/report/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["incidents", "{{incidentId}}", "report", "pdf"]
+            },
+            "description": "Generates and streams a professional executive multi-page PDF report with banner, evidence, MITRE mappings, threat intel, timeline, and AI assessment."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Alerts & Detection",
+      "item": [
+        {
+          "name": "Get All Alerts",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/alerts",
+              "host": ["{{baseUrl}}"],
+              "path": ["alerts"]
+            }
+          }
+        },
+        {
+          "name": "Get Alert by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/alerts/{{alertId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["alerts", "{{alertId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Alert Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"investigating\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/alerts/{{alertId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["alerts", "{{alertId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "Run Detection Engine",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/detection/run",
+              "host": ["{{baseUrl}}"],
+              "path": ["detection", "run"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Analysis",
+      "item": [
+        {
+          "name": "Get AI Analysis for Alert",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/ai/alerts/{{alertId}}/analysis",
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "alerts", "{{alertId}}", "analysis"]
+            }
+          }
+        },
+        {
+          "name": "Trigger AI Analysis on Alert",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/ai/alerts/{{alertId}}/analyze",
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "alerts", "{{alertId}}", "analyze"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard & Telemetry",
+      "item": [
+        {
+          "name": "Get Dashboard Summary",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "summary"]
+            }
+          }
+        },
+        {
+          "name": "Get Normalized Logs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/normalized-logs",
+              "host": ["{{baseUrl}}"],
+              "path": ["normalized-logs"]
+            }
+          }
+        },
+        {
+          "name": "Get Log Sources",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/log-sources",
+              "host": ["{{baseUrl}}"],
+              "path": ["log-sources"]
+            }
+          }
+        },
+        {
+          "name": "Get Response Actions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/response-actions",
+              "host": ["{{baseUrl}}"],
+              "path": ["response-actions"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
