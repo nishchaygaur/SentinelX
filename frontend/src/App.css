@@ -2599,6 +2599,31 @@ button.table-row:hover {
   gap: 12px;
 }
 
+.docs-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid #334155;
+  color: #cbd5e1;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.docs-nav-btn:hover {
+  background: rgba(51, 65, 85, 0.9);
+  border-color: #6366f1;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.3);
+  transform: translateY(-1px);
+}
+
 .generate-btn {
   display: inline-flex;
   align-items: center;

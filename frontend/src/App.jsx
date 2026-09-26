@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   Activity,
   AlertTriangle,
+  BookOpen,
   Bot,
   BrainCircuit,
   CheckCircle2,
@@ -28,6 +29,7 @@ import {
 
 import "./App.css";
 import Select from "./components/Select.jsx";
+import DocsViewer from "./components/DocsViewer.jsx";
 
 const RAW_API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const API_BASE = RAW_API_URL.replace(/\/+$/, "").endsWith("/api")
@@ -36,6 +38,39 @@ const API_BASE = RAW_API_URL.replace(/\/+$/, "").endsWith("/api")
 
 function App() {
   const [activeSection, setActiveSection] = useState("dashboard");
+  const [isDocsOpen, setIsDocsOpen] = useState(() => {
+    return window.location.pathname === "/docs" || window.location.pathname.startsWith("/docs/");
+  });
+  const [docsParamId, setDocsParamId] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("doc") || "README";
+  });
+
+  // Handle browser Back / Forward history for /docs
+  useEffect(() => {
+    const onPopState = () => {
+      const isDocs = window.location.pathname === "/docs" || window.location.pathname.startsWith("/docs/");
+      setIsDocsOpen(isDocs);
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("doc")) {
+        setDocsParamId(params.get("doc"));
+      }
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  const handleNavigateDocs = (docId = "README") => {
+    setIsDocsOpen(true);
+    setDocsParamId(docId);
+    const targetUrl = docId && docId !== "README" ? `/docs?doc=${encodeURIComponent(docId)}` : "/docs";
+    window.history.pushState({ docId }, "", targetUrl);
+  };
+
+  const handleNavigateHome = () => {
+    setIsDocsOpen(false);
+    window.history.pushState({}, "", "/");
+  };
 
   const [dashboard, setDashboard] = useState(null);
   const [incidents, setIncidents] = useState([]);
@@ -754,6 +789,19 @@ function App() {
   };
 
   // =========================================================
+  // DEDICATED FULL-BROWSER DOCUMENTATION EXPLORER
+  // =========================================================
+
+  if (isDocsOpen) {
+    return (
+      <DocsViewer
+        onNavigateHome={handleNavigateHome}
+        initialDocId={docsParamId}
+      />
+    );
+  }
+
+  // =========================================================
   // LOADING SCREEN
   // =========================================================
 
@@ -800,6 +848,7 @@ function App() {
         onRefresh={refresh}
         generatingIncident={generatingIncident}
         onGenerateRandomIncident={handleGenerateRandomIncident}
+        onNavigateDocs={() => handleNavigateDocs()}
       />
 
       <div className="dashboard-layout">
@@ -807,6 +856,7 @@ function App() {
         <Sidebar
           activeSection={activeSection}
           setActiveSection={setActiveSection}
+          onNavigateDocs={() => handleNavigateDocs()}
           alertCount={alerts.length}
           incidentCount={incidents.length}
         />
@@ -989,6 +1039,7 @@ function Topbar({
   onRefresh,
   generatingIncident,
   onGenerateRandomIncident,
+  onNavigateDocs,
 }) {
   return (
     <header className="topbar">
@@ -1017,6 +1068,16 @@ function Topbar({
             All Systems Operational
           </span>
         </div>
+
+        <button
+          type="button"
+          className="docs-nav-btn"
+          onClick={onNavigateDocs}
+          title="Open SentinelX full-screen documentation explorer"
+        >
+          <BookOpen size={14} />
+          Documentation
+        </button>
 
         <button
           type="button"
@@ -1060,6 +1121,7 @@ function Topbar({
 function Sidebar({
   activeSection,
   setActiveSection,
+  onNavigateDocs,
   alertCount,
   incidentCount,
 }) {
@@ -1128,6 +1190,17 @@ function Sidebar({
         ],
       ],
     },
+
+    {
+      label: "SYSTEM",
+      items: [
+        [
+          "docs",
+          "Documentation",
+          BookOpen,
+        ],
+      ],
+    },
   ];
 
   return (
@@ -1159,9 +1232,13 @@ function Sidebar({
                       ? "active"
                       : ""
                   }`}
-                  onClick={() =>
-                    setActiveSection(id)
-                  }
+                  onClick={() => {
+                    if (id === "docs") {
+                      onNavigateDocs?.();
+                    } else {
+                      setActiveSection(id);
+                    }
+                  }}
                 >
 
                   <Icon size={16} />

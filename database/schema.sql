@@ -21,6 +21,15 @@ CREATE TABLE IF NOT EXISTS log_sources (
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Default SentinelX Log Sources
+INSERT INTO log_sources (name, source_type, description, enabled) VALUES
+    ('Windows Event Logs', 'windows_event_log', 'Windows security and system event logs collected for SentinelX detection and analysis', true),
+    ('Linux SSH Logs', 'linux_ssh', 'Linux SSH authentication and security logs collected for SentinelX detection and analysis', true),
+    ('Web Server Logs', 'web_server', 'Web server access and error logs collected for SentinelX web attack detection', true),
+    ('Firewall Logs', 'firewall', 'Firewall traffic and security events collected for SentinelX network threat detection', true),
+    ('Application Logs', 'application', 'Application-level logs collected for SentinelX anomaly and security event detection', true)
+ON CONFLICT (name) DO NOTHING;
+
 -- 3. Raw Logs Table
 CREATE TABLE IF NOT EXISTS raw_logs (
     id BIGSERIAL PRIMARY KEY,
