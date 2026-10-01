@@ -2800,3 +2800,58 @@ button.table-row:hover {
   border: 1px solid #6366f1;
   color: #e0e7ff;
 }
+
+/* Floating AI Copilot Launcher */
+.floating-copilot-launcher {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #1e1545 0%, #0f172a 100%);
+  border: 1px solid #785be8;
+  color: #f1f5f9;
+  padding: 10px 18px;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(120, 91, 232, 0.4), 0 0 15px rgba(56, 189, 248, 0.2);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+}
+
+.floating-copilot-launcher:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 36px rgba(120, 91, 232, 0.6), 0 0 20px rgba(56, 189, 248, 0.4);
+  border-color: #a855f7;
+  color: #ffffff;
+}
+
+.floating-copilot-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a855f7;
+}
+
+.copilot-pulse-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #35d07f;
+  box-shadow: 0 0 8px #35d07f;
+}
+
+.floating-copilot-text {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  background: linear-gradient(90deg, #d6cbff 0%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

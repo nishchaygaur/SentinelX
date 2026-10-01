@@ -2,6 +2,11 @@ const pool = require("../config/db");
 const {
     analyzeAlertWithAI
 } = require("../services/aiService");
+const {
+    SWARM_AGENTS,
+    chatWithCopilot,
+    investigateWithSwarm
+} = require("../services/aiCopilotService");
 
 const analyzeAlert = async (req, res) => {
     try {
@@ -303,7 +308,90 @@ const getAIAnalysis = async (req, res) => {
     }
 };
 
+/**
+ * Interactive Conversational Copilot Chat endpoint
+ * POST /api/ai/chat
+ */
+const handleCopilotChat = async (req, res) => {
+    try {
+        const { message, incidentId, agentRole = "swarm", history = [] } = req.body;
+
+        if (!message || typeof message !== "string" || !message.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Message string is required"
+            });
+        }
+
+        const result = await chatWithCopilot({
+            message: message.trim(),
+            incidentId: incidentId ? parseInt(incidentId, 10) : null,
+            agentRole,
+            history
+        });
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+    } catch (error) {
+        console.error("Copilot chat controller error:", error.message);
+        res.status(500).json({
+            success: false,
+            message: "Failed to process Copilot chat",
+            error: error.message
+        });
+    }
+};
+
+/**
+ * Autonomous Swarm Investigation endpoint
+ * POST /api/ai/swarm-investigate
+ */
+const handleSwarmInvestigate = async (req, res) => {
+    try {
+        const { incidentId } = req.body;
+
+        if (!incidentId) {
+            return res.status(400).json({
+                success: false,
+                message: "incidentId is required to run a swarm investigation"
+            });
+        }
+
+        const result = await investigateWithSwarm({
+            incidentId: parseInt(incidentId, 10)
+        });
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+    } catch (error) {
+        console.error("Swarm investigation controller error:", error.message);
+        res.status(500).json({
+            success: false,
+            message: "Failed to execute autonomous swarm investigation",
+            error: error.message
+        });
+    }
+};
+
+/**
+ * List available Swarm Agents
+ * GET /api/ai/agents
+ */
+const getSwarmAgents = (req, res) => {
+    res.status(200).json({
+        success: true,
+        data: Object.values(SWARM_AGENTS)
+    });
+};
+
 module.exports = {
     analyzeAlert,
-    getAIAnalysis
+    getAIAnalysis,
+    handleCopilotChat,
+    handleSwarmInvestigate,
+    getSwarmAgents
 };

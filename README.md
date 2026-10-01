@@ -285,10 +285,16 @@ docker compose up --build
 5. **Malware Execution Indicators (`MALWARE_INDICATOR_DETECTED`)**: Known offensive security tools (Mimikatz, PowerShell `-enc`). MITRE T1059.001.
 6. **Anomalous Security Activity (`ANOMALOUS_SECURITY_ACTIVITY`)**: High-volume request bursts or anomaly telemetry. MITRE T1070.
 
-### AI Threat Investigation & Incident Response
-- **OpenRouter AI Copilot**: Generates executive incident summaries, root cause analyses, attack likelihood estimations, and actionable containment playbooks.
+### AI Threat Investigation & Autonomous Multi-Agent Swarm
+- **Autonomous Multi-Agent Swarm**: 4 specialist personas (🛡️ Sentinel-Triage, 🔍 Sentinel-Hunter, 🌐 Sentinel-Intel, ⚡ Sentinel-Responder) coordinate with a Swarm Lead to produce deep incident dossiers with root cause triage, blast radius mapping, IoC reputation analysis, and executable containment scripts.
+- **Interactive Conversational Copilot**: Conversational SOC assistant with custom agent persona selector, quick prompt chips, and contextual alert bridging via OpenRouter AI or built-in deterministic fallback engine.
 - **Random Incident Generator**: One-click generation of authentic attack scenarios with realistic telemetry, MITRE ATT&CK mapping, threat intel IoCs, and audit timeline for live SOC training and demos.
 - **Professional PDF Incident Reports**: Export pixel-perfect SOC incident reports including executive summaries, alert breakdowns, and full audit timelines with one click.
+
+### Interactive MITRE ATT&CK Enterprise Matrix
+- **Full Enterprise Coverage**: Visualizes all 14 tactics (TA0043 Reconnaissance to TA0040 Impact) and 38+ enterprise techniques.
+- **Heatmap Filtering & Real-time Metrics**: Coverage KPIs (Tactics, Techniques, Coverage %), dynamic filters (All, Detected Hits, Covered by Rules, Blind Spots), and technique search.
+- **Technique Inspector Modal**: In-depth mitigation strategies, detection logic, and 1-click bridge to consult AI Copilot on defensive postures.
 
 ---
 
@@ -307,6 +313,16 @@ Hosted under `/api`:
 - `GET /api/alerts` — Retrieve all detected alerts with join metadata.
 - `GET /api/alerts/:id/enrichment` — Retrieve MITRE ATT&CK and Threat Intel for an alert.
 - `PATCH /api/alerts/:id/status` — Update alert triage status (`new`, `acknowledged`, `investigating`, `resolved`).
+
+### AI Copilot & Multi-Agent Swarm
+- `POST /api/ai/chat` — Conversational SOC copilot chat supporting specialist personas.
+- `POST /api/ai/swarm-investigate` — Trigger autonomous multi-agent swarm investigation on an alert or incident.
+- `GET /api/ai/agents` — List available specialist agent profiles.
+- `POST /api/ai/investigate` — Incident root cause analysis and impact evaluation.
+
+### MITRE ATT&CK Matrix
+- `GET /api/mitre/matrix` — Enterprise matrix data with coverage statistics and incident correlation.
+- `GET /api/mitre/techniques/:id` — Technique details, mitigations, and detection rules.
 
 ### Incidents & Lifecycle
 - `GET /api/incidents` — List all security incidents.
@@ -334,6 +350,9 @@ Hosted under `/api`:
 # Run backend test suite
 npm --prefix backend test
 
+# Run copilot & MITRE tests
+node tests/copilot_and_mitre.test.js
+
 # Run end-to-end audit verification
 node tests/verify_audit.js
 
@@ -344,7 +363,8 @@ npm --prefix frontend run lint
 npm --prefix frontend run build
 ```
 
-- **Backend Tests**: 40/40 tests passing (100%)
+- **Backend Tests**: 51/51 tests passing (100%)
 - **Verification Audit**: 15/15 audit checks passing (100%)
 - **Frontend Linter**: 0 warnings, 0 errors
 - **Production Build**: 550ms Vite build with 0 errors
+

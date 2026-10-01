@@ -30,6 +30,8 @@ import {
 import "./App.css";
 import Select from "./components/Select.jsx";
 import DocsViewer from "./components/DocsViewer.jsx";
+import MitreHeatmap from "./components/MitreHeatmap.jsx";
+import AICopilot from "./components/AICopilot.jsx";
 
 const RAW_API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const API_BASE = RAW_API_URL.replace(/\/+$/, "").endsWith("/api")
@@ -88,8 +90,14 @@ function App() {
 
   const [generatingIncident, setGeneratingIncident] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [copilotPrompt, setCopilotPrompt] = useState("");
   const [toast, setToast] = useState(null);
   const toastTimeoutRef = useRef(null);
+
+  const handleAskCopilot = (prompt) => {
+    setCopilotPrompt(prompt);
+    setActiveSection("ai");
+  };
 
   const showToast = (message, type = "info") => {
     if (toastTimeoutRef.current) {
@@ -922,16 +930,18 @@ function App() {
           )}
 
           {activeSection === "mitre" && (
-            <MitreView
+            <MitreHeatmap
               report={report}
               incidents={incidents}
               selectedIncident={selectedIncident}
               onIncidentSelect={loadIncidentReport}
+              onAskCopilot={handleAskCopilot}
+              apiBase={API_BASE}
             />
           )}
 
           {activeSection === "ai" && (
-            <AIView
+            <AICopilot
               report={report}
               incidents={incidents}
               selectedIncident={selectedIncident}
@@ -942,6 +952,8 @@ function App() {
               onGenerate={generateAIAnalysis}
               onGenerateAll={generateAllMissingAI}
               onRefresh={loadAIAnalysis}
+              apiBase={API_BASE}
+              initialPrompt={copilotPrompt}
             />
           )}
 
@@ -987,6 +999,21 @@ function App() {
 
         </main>
       </div>
+
+      {activeSection !== "ai" && (
+        <button
+          type="button"
+          className="floating-copilot-launcher"
+          onClick={() => setActiveSection("ai")}
+          title="Open SentinelX AI Security Copilot & Swarm"
+        >
+          <div className="floating-copilot-icon">
+            <Bot size={18} />
+            <span className="copilot-pulse-dot" />
+          </div>
+          <span className="floating-copilot-text">AI Copilot</span>
+        </button>
+      )}
 
       {toast && (
         <div className="sentinel-toast-container">
@@ -2815,431 +2842,6 @@ function ThreatIntelView({
 
       </section>
     </>
-  );
-}
-
-// =========================================================
-// MITRE
-// =========================================================
-
-function MitreView({
-  report,
-  incidents,
-  selectedIncident,
-  onIncidentSelect,
-}) {
-  const mappings =
-    report?.mitre_attack || [];
-
-  return (
-    <>
-      <PageHeader
-        eyebrow="INTELLIGENCE / MITRE"
-        title="MITRE ATT&CK Mapping"
-        description="Map detected behavior to adversary tactics and techniques"
-      />
-
-      <section className="panel response-control-panel">
-        <div className="response-control-header">
-          <div>
-            <span className="eyebrow">ACTIVE INCIDENT</span>
-            <h3>
-              {report?.incident
-                ? `INC-${report.incident.id} · ${report.incident.title}`
-                : "Select an incident"}
-            </h3>
-            <p>Choose an incident to view its MITRE ATT&CK mappings.</p>
-          </div>
-
-          <div className="response-control-actions">
-            <Select
-              className="response-select"
-              value={selectedIncident || ""}
-              placeholder="Choose incident"
-              onChange={(id) => {
-                if (id) onIncidentSelect(id);
-              }}
-              options={[
-                { value: "", label: "Choose incident" },
-                ...incidents.map((incident) => ({
-                  value: incident.id,
-                  label: `INC-${incident.id} · ${incident.title}`,
-                  title: `INC-${incident.id} · ${incident.title}`,
-                })),
-              ]}
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="panel">
-
-        <PanelTitle
-          icon={Target}
-          title="Technique Mappings"
-          count={mappings.length}
-        />
-
-        {mappings.length ? (
-          <div className="mitre-grid">
-
-            {mappings.map(
-              (item, index) => (
-                <div
-                  className="mitre-card"
-                  key={index}
-                >
-
-                  <div className="mitre-technique">
-                    {item.technique_id}
-                  </div>
-
-                  <h3>
-                    {item.technique_name}
-                  </h3>
-
-                  <span>
-                    {item.tactic_id} ·{" "}
-                    {item.tactic_name}
-                  </span>
-
-                  <p>
-                    {item.description}
-                  </p>
-
-                </div>
-              )
-            )}
-
-          </div>
-        ) : (
-          <EmptyState
-            text="No MITRE mappings available"
-          />
-        )}
-
-      </section>
-    </>
-  );
-}
-
-// =========================================================
-// AI ANALYSIS
-// =========================================================
-
-function AIView({
-  report,
-  incidents,
-  selectedIncident,
-  onIncidentSelect,
-  analyses,
-  loading,
-  generating,
-  onGenerate,
-  onGenerateAll,
-  onRefresh,
-}) {
-  const incidentAlerts = report?.alerts || [];
-  const analysisByAlert = new Map(
-    analyses.map((analysis) => [
-      String(analysis.alert_id),
-      analysis,
-    ])
-  );
-
-  const missingAlerts = incidentAlerts.filter(
-    (alert) =>
-      !analysisByAlert.has(String(alert.id))
-  );
-
-  return (
-    <>
-      <PageHeader
-        eyebrow="INTELLIGENCE / AI"
-        title="AI Security Analysis"
-        description="AI-assisted threat assessment and investigation guidance"
-      />
-
-      <section className="panel response-control-panel">
-        <div className="response-control-header">
-          <div>
-            <span className="eyebrow">ACTIVE INCIDENT</span>
-            <h3>
-              {report?.incident
-                ? `INC-${report.incident.id} · ${report.incident.title}`
-                : "Select an incident"}
-            </h3>
-            <p>Choose an incident to view or generate its AI security analysis.</p>
-          </div>
-
-          <div className="response-control-actions">
-            <Select
-              className="response-select"
-              value={selectedIncident || ""}
-              placeholder="Choose incident"
-              onChange={(id) => {
-                if (id) onIncidentSelect(id);
-              }}
-              options={[
-                { value: "", label: "Choose incident" },
-                ...incidents.map((incident) => ({
-                  value: incident.id,
-                  label: `INC-${incident.id} · ${incident.title}`,
-                  title: `INC-${incident.id} · ${incident.title}`,
-                })),
-              ]}
-            />
-          </div>
-        </div>
-      </section>
-
-      {!report ? (
-        <section className="panel ai-empty-panel">
-          <BrainCircuit size={28} />
-          <h3>Select an incident first</h3>
-          <p>
-            Choose an incident above to analyze its associated alerts with OpenRouter AI.
-          </p>
-        </section>
-      ) : (
-        <>
-          <section className="panel ai-context-panel">
-            <div className="ai-context-info">
-              <div>
-                <span className="eyebrow">
-                  SELECTED INCIDENT
-                </span>
-                <h3>{report.incident?.title}</h3>
-                <p>
-                  INC-{report.incident?.id} ·{" "}
-                  {incidentAlerts.length} associated alert
-                  {incidentAlerts.length === 1 ? "" : "s"}
-                </p>
-              </div>
-
-              <div className="ai-action-group">
-                {missingAlerts.length > 0 && (
-                  <button
-                    className="ai-action-btn"
-                    type="button"
-                    onClick={onGenerateAll}
-                    disabled={generating}
-                  >
-                    <BrainCircuit size={15} />
-                    {generating
-                      ? "Generating..."
-                      : `Analyze ${missingAlerts.length} Alert${
-                          missingAlerts.length === 1 ? "" : "s"
-                        }`}
-                  </button>
-                )}
-
-                <button
-                  className="ai-secondary-btn"
-                  type="button"
-                  onClick={() =>
-                    onRefresh(incidentAlerts)
-                  }
-                  disabled={loading || generating}
-                >
-                  <RefreshCw
-                    size={14}
-                    className={loading ? "spin" : ""}
-                  />
-                  Refresh AI
-                </button>
-              </div>
-            </div>
-          </section>
-
-          {loading && !analyses.length ? (
-            <section className="panel">
-              <div className="ai-loading">
-                <BrainCircuit size={24} />
-                <strong>Loading AI analysis...</strong>
-                <span>
-                  Reading persisted SentinelX AI results.
-                </span>
-              </div>
-            </section>
-          ) : analyses.length ? (
-            analyses.map((ai) => (
-              <AIAnalysisCard
-                key={ai.id}
-                ai={ai}
-                incidentAlerts={incidentAlerts}
-                onGenerate={onGenerate}
-                generating={generating}
-              />
-            ))
-          ) : (
-            <section className="panel ai-empty-panel">
-              <BrainCircuit size={28} />
-              <h3>No AI analysis generated yet</h3>
-              <p>
-                SentinelX has the incident and alert context,
-                but no saved AI assessment exists yet.
-              </p>
-
-              {incidentAlerts.length > 0 && (
-                <button
-                  className="ai-action-btn"
-                  type="button"
-                  onClick={() =>
-                    onGenerate(incidentAlerts[0].id)
-                  }
-                  disabled={generating}
-                >
-                  <BrainCircuit size={15} />
-                  {generating
-                    ? "Generating..."
-                    : "Generate AI Analysis"}
-                </button>
-              )}
-            </section>
-          )}
-
-          {missingAlerts.length > 0 && analyses.length > 0 && (
-            <section className="panel ai-missing-panel">
-              <AlertTriangle size={16} />
-              <span>
-                {missingAlerts.length} associated alert
-                {missingAlerts.length === 1 ? " has" : "s have"} no
-                saved AI analysis yet.
-              </span>
-            </section>
-          )}
-        </>
-      )}
-    </>
-  );
-}
-
-// =========================================================
-// AI ANALYSIS CARD
-// =========================================================
-
-function AIAnalysisCard({
-  ai,
-  incidentAlerts,
-  onGenerate,
-  generating,
-}) {
-  const alert = incidentAlerts.find(
-    (item) =>
-      String(item.id) === String(ai.alert_id)
-  );
-
-  return (
-    <section className="panel ai-analysis-card">
-      <div className="ai-analysis-header">
-        <div>
-          <span className="eyebrow">AI ANALYSIS</span>
-          <h3>
-            Alert #{ai.alert_id}
-            {alert?.detection_rule
-              ? ` · ${alert.detection_rule}`
-              : ""}
-          </h3>
-        </div>
-
-        <div className="ai-provider">
-          <span className="ai-dot" />
-          <Bot size={14} />
-          {ai.provider || "OpenRouter"} ·{" "}
-          {ai.model_name || "AI Model"}
-        </div>
-      </div>
-
-      {alert && (
-        <div className="ai-alert-context">
-          <span className={`severity-badge ${alert.severity}`}>
-            {alert.severity}
-          </span>
-          <span className="risk-score">
-            Risk {alert.risk_score}
-          </span>
-          <span>{alert.title}</span>
-        </div>
-      )}
-
-      <div className="ai-analysis-grid">
-        <AIBlock
-          title="Summary"
-          text={ai.summary}
-        />
-
-        <AIBlock
-          title="Threat Assessment"
-          text={ai.threat_assessment}
-        />
-
-        <AIBlock
-          title="Risk Explanation"
-          text={ai.risk_explanation}
-        />
-
-        <div className="ai-block">
-          <h4>Investigation Steps</h4>
-          <ol>
-            {(ai.investigation_steps || []).map(
-              (step, index) => (
-                <li key={index}>{step}</li>
-              )
-            )}
-          </ol>
-        </div>
-
-        <div className="ai-block">
-          <h4>Recommended Response</h4>
-          <ol>
-            {(ai.recommended_response || []).map(
-              (step, index) => (
-                <li key={index}>{step}</li>
-              )
-            )}
-          </ol>
-        </div>
-      </div>
-
-      <div className="ai-card-footer">
-        <span>
-          Generated{" "}
-          {ai.created_at
-            ? formatDate(ai.created_at)
-            : "—"}
-        </span>
-
-        <button
-          className="ai-secondary-btn"
-          type="button"
-          onClick={() => onGenerate(ai.alert_id)}
-          disabled={generating}
-        >
-          <RefreshCw size={13} />
-          Regenerate
-        </button>
-      </div>
-    </section>
-  );
-}
-
-// =========================================================
-// AI BLOCK
-// =========================================================
-
-function AIBlock({
-  title,
-  text,
-}) {
-  return (
-    <div className="ai-block">
-
-      <h4>{title}</h4>
-
-      <p>{text}</p>
-
-    </div>
   );
 }
 

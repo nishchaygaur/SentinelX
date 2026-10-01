@@ -30,6 +30,8 @@ The following table provides a complete breakdown of features implemented in Sen
 | **Response** | Simulated Incident Containment Actions | **Production** | `backend/src/controllers/responseActionController.js` |
 | **Reporting** | Server-Side Dynamic PDF Report Generation | **Production** | `backend/src/services/pdfReportService.js` |
 | **Scanner** | Native YARA v4.5.5 Malware File Scanner | **Production** | `yara/rules/malware_rules.yar`, `scripts/scanYara.js` |
+| **MITRE Matrix** | Interactive 14-Tactic ATT&CK Heatmap Matrix & Coverage Analytics | **Production** | `GET /api/mitre/matrix`, `frontend/src/components/MitreHeatmap.jsx` |
+| **AI Swarm** | Autonomous 4-Agent Swarm (Triage, Hunter, Intel, Responder) & Copilot | **Production** | `POST /api/ai/chat`, `POST /api/ai/swarm-investigate`, `frontend/src/components/AICopilot.jsx` |
 | **UI** | Real-time SOC Executive & Operational Dashboard | **Production** | React 19 Frontend (`frontend/src/App.jsx`) |
 | **UI** | Dedicated Full-Screen Documentation Explorer | **Production** | Dedicated Route `/docs` |
 

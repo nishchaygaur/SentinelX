@@ -13,6 +13,7 @@ const reportRoutes = require("./routes/reportRoutes");
 const logSourceRoutes = require("./routes/logSourceRoutes");
 const normalizedLogRoutes = require("./routes/normalizedLogRoutes");
 const ingestionRoutes = require("./routes/ingestionRoutes");
+const mitreRoutes = require("./routes/mitreRoutes");
 
 const app = express();
 
@@ -92,6 +93,7 @@ app.use("/api/incidents", incidentRoutes);
 app.use("/api/response-actions", responseActionRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/mitre", mitreRoutes);
 app.use("/api", reportRoutes);
 
 // Global error handler
