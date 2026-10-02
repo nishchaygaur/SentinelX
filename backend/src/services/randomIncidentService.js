@@ -652,14 +652,16 @@ const SCENARIOS = [
  * Generates and saves a complete, realistic simulated incident into PostgreSQL.
  * Everything executes in a single database transaction.
  */
-async function createRandomSimulatedIncident() {
+async function createRandomSimulatedIncident(specificScenarioId = null) {
     const client = await pool.connect();
 
     try {
         await client.query("BEGIN");
 
-        // 1. Pick a scenario at random
-        const scenario = SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)];
+        // 1. Pick a scenario (either requested or random)
+        const scenario = specificScenarioId
+            ? (SCENARIOS.find(s => s.id === specificScenarioId) || SCENARIOS[0])
+            : SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)];
 
         // Compute dynamic scenario fields
         const sourceIP = typeof scenario.sourceIP === "function" ? scenario.sourceIP() : scenario.sourceIP;
