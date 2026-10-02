@@ -12,6 +12,7 @@ import {
   User,
   Trash2,
   Info,
+  Terminal,
 } from "lucide-react";
 import "./AICopilot.css";
 import Select from "./Select.jsx";
@@ -702,38 +703,37 @@ export default function AICopilot({
             <button
               type="button"
               className="prompt-chip"
-              onClick={() =>
-                handleSendMessage("Generate immediate firewall containment rules (iptables & PowerShell) for the attacker IP.")
-              }
+              onClick={() => handleSendMessage("What is the attacker IP?")}
             >
-              ⚡ Contain Attacker IP
+              ⚡ Attacker IP
             </button>
             <button
               type="button"
               className="prompt-chip"
-              onClick={() =>
-                handleSendMessage("Analyze patient zero, lateral movement, and blast radius for this incident.")
-              }
+              onClick={() => handleSendMessage("How do I block this attack?")}
             >
-              🔍 Blast Radius & Lateral Movement
+              🛡️ Block Command
             </button>
             <button
               type="button"
               className="prompt-chip"
-              onClick={() =>
-                handleSendMessage("Assess threat actor attribution and IoC reputation for observed telemetry.")
-              }
+              onClick={() => handleSendMessage("Who is the targeted account and host?")}
             >
-              🌐 Threat Intel Attribution
+              👤 Target Account
             </button>
             <button
               type="button"
               className="prompt-chip"
-              onClick={() =>
-                handleSendMessage("Draft an executive incident notification and remediation summary.")
-              }
+              onClick={() => handleSendMessage("What is the severity and status?")}
             >
-              📋 Executive Incident Summary
+              📊 Severity & Status
+            </button>
+            <button
+              type="button"
+              className="prompt-chip"
+              onClick={() => handleSendMessage("Give a 1-sentence incident summary")}
+            >
+              📝 1-Sentence Summary
             </button>
           </div>
 
@@ -903,9 +903,38 @@ export default function AICopilot({
 function getSeverityBadgeClass(text) {
   const t = (text || "").trim().toUpperCase();
   if (t === "CRITICAL" || t === "MALICIOUS" || t === "HIGH RISK" || t === "HIGH") return "badge-danger";
-  if (t === "WARNING" || t === "MEDIUM" || t === "SUSPICIOUS") return "badge-warning";
-  if (t === "LOW" || t === "INFO" || t === "CLEAN" || t === "BENIGN" || t === "COMPLETED") return "badge-success";
+  if (t === "WARNING" || t === "MEDIUM" || t === "SUSPICIOUS" || t === "INVESTIGATING") return "badge-warning";
+  if (t === "LOW" || t === "INFO" || t === "CLEAN" || t === "BENIGN" || t === "COMPLETED" || t === "OPEN" || t === "RESOLVED") return "badge-success";
   return "";
+}
+
+function extractKeyValues(line) {
+  if (!line) return null;
+  const trimmed = line.trim();
+  if (trimmed.startsWith("|") && trimmed.endsWith("|")) return null;
+  if (trimmed.startsWith("```") || trimmed.startsWith(">") || trimmed.startsWith("#") || trimmed.startsWith("*") || trimmed.startsWith("-")) return null;
+
+  const parts = trimmed.split(/\s*\|\s*/);
+  const pairs = [];
+  const kvRegex = /^(?:\*\*)?([A-Za-z0-9_\-\s/()#]+?)(?:\*\*)?:\s*(.+)$/;
+
+  for (const part of parts) {
+    const pTrim = part.trim();
+    const match = pTrim.match(kvRegex);
+    if (match) {
+      const key = match[1].trim();
+      const val = match[2].trim();
+      if (key.length <= 32 && val.length > 0) {
+        pairs.push({ key, val });
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  return pairs.length > 0 ? pairs : null;
 }
 
 function renderInlineMarkdown(text = "") {
@@ -972,7 +1001,10 @@ function ChatMarkdownRenderer({ text = "", onCopy, copiedCode }) {
           return (
             <div className="chat-code-block" key={pIdx}>
               <div className="code-block-header">
-                <span>{lang || "terminal"}</span>
+                <span className="code-lang-tag">
+                  <Terminal size={12} />
+                  <span>{lang || "bash"}</span>
+                </span>
                 <button
                   type="button"
                   className="code-copy-btn"
@@ -980,10 +1012,10 @@ function ChatMarkdownRenderer({ text = "", onCopy, copiedCode }) {
                   title="Copy command"
                 >
                   {copiedCode[codeId] ? <Check size={12} /> : <Copy size={12} />}
-                  <span>{copiedCode[codeId] ? "Copied" : "Copy"}</span>
+                  <span>{copiedCode[codeId] ? "Copied" : "Copy Command"}</span>
                 </button>
               </div>
-              <pre><code>{code}</code></pre>
+              <pre className="copilot-code-pre"><code>{code}</code></pre>
             </div>
           );
         }
@@ -999,6 +1031,93 @@ function ChatMarkdownRenderer({ text = "", onCopy, copiedCode }) {
 
           if (!trimmed) {
             i++;
+            continue;
+          }
+
+          // Single standalone IPv4 entity
+          if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(trimmed)) {
+            const ipId = `ip-raw-${pIdx}-${i}`;
+            blocks.push(
+              <div className="copilot-entity-chip-wrapper" key={`entity-${i}`}>
+                <span className="copilot-entity-label">Adversary IP</span>
+                <div className="copilot-ip-pill primary">
+                  <span className="copilot-ip-text">{trimmed}</span>
+                  <button
+                    type="button"
+                    className="copilot-mini-copy-btn"
+                    onClick={() => onCopy(ipId, trimmed)}
+                    title="Copy IP"
+                  >
+                    {copiedCode[ipId] ? <Check size={11} /> : <Copy size={11} />}
+                    <span>{copiedCode[ipId] ? "Copied" : "Copy"}</span>
+                  </button>
+                </div>
+              </div>
+            );
+            i++;
+            continue;
+          }
+
+          // Key-Value data row detection
+          const initialKv = extractKeyValues(trimmed);
+          if (initialKv) {
+            const kvGroup = [...initialKv];
+            i++;
+            while (i < lines.length) {
+              const nextTrimmed = lines[i].trim();
+              if (!nextTrimmed) {
+                i++;
+                continue;
+              }
+              const nextKv = extractKeyValues(nextTrimmed);
+              if (nextKv) {
+                kvGroup.push(...nextKv);
+                i++;
+              } else {
+                break;
+              }
+            }
+
+            blocks.push(
+              <div className="copilot-data-card" key={`kvgroup-${i}`}>
+                <div className="copilot-kv-grid">
+                  {kvGroup.map((pair, pIdx2) => {
+                    const cleanVal = pair.val.replace(/^`|`$/g, "").trim();
+                    const isIp = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(cleanVal);
+                    const isSeverity = /^(CRITICAL|HIGH|MEDIUM|LOW|OPEN|INVESTIGATING|CLOSED|RESOLVED|MALICIOUS)$/i.test(cleanVal);
+                    const sevClass = getSeverityBadgeClass(cleanVal);
+                    const copyId = `kv-copy-${i}-${pIdx2}`;
+
+                    return (
+                      <div className="copilot-kv-item" key={pIdx2}>
+                        <span className="copilot-kv-label">{pair.key}</span>
+                        <div className="copilot-kv-value-row">
+                          {isSeverity ? (
+                            <span className={`copilot-sev-badge ${sevClass || cleanVal.toLowerCase()}`}>
+                              {cleanVal.toUpperCase()}
+                            </span>
+                          ) : isIp ? (
+                            <div className="copilot-ip-pill">
+                              <span className="copilot-ip-text">{cleanVal}</span>
+                              <button
+                                type="button"
+                                className="copilot-mini-copy-btn"
+                                onClick={() => onCopy(copyId, cleanVal)}
+                                title="Copy IP"
+                              >
+                                {copiedCode[copyId] ? <Check size={11} /> : <Copy size={11} />}
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="copilot-value-text">{renderInlineMarkdown(pair.val)}</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
             continue;
           }
 
@@ -1068,32 +1187,13 @@ function ChatMarkdownRenderer({ text = "", onCopy, copiedCode }) {
             continue;
           }
 
-          // Headings: ###, ####, ##
-          if (trimmed.startsWith("### ")) {
+          // Clean Headings: render as crisp eyebrow section label without raw #
+          if (/^#{1,4}\s+/.test(trimmed)) {
             blocks.push(
-              <h3 className="chat-h3" key={`h3-${i}`}>
-                {renderInlineMarkdown(trimmed.slice(4))}
-              </h3>
-            );
-            i++;
-            continue;
-          }
-
-          if (trimmed.startsWith("#### ")) {
-            blocks.push(
-              <h4 className="chat-h4" key={`h4-${i}`}>
-                {renderInlineMarkdown(trimmed.slice(5))}
-              </h4>
-            );
-            i++;
-            continue;
-          }
-
-          if (trimmed.startsWith("## ")) {
-            blocks.push(
-              <h2 className="chat-h2" key={`h2-${i}`}>
-                {renderInlineMarkdown(trimmed.slice(3))}
-              </h2>
+              <div className="copilot-section-eyebrow" key={`h-${i}`}>
+                <Sparkles size={12} />
+                <span>{renderInlineMarkdown(trimmed.replace(/^#{1,4}\s+/, ""))}</span>
+              </div>
             );
             i++;
             continue;

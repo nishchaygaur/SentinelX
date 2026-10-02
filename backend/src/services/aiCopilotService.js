@@ -164,86 +164,68 @@ function generateDeterministicCopilotResponse({ message, agentRole, incidentCont
     }
 
     // 2. User / Identity inquiry
-    if (msg.includes("user") || msg.includes("username") || msg.includes("account") || msg.includes("identity") || msg.includes("who logged in")) {
+    if (msg.includes("user") || msg.includes("username") || msg.includes("account") || msg.includes("identity") || msg.includes("who logged in") || msg === "user" || msg === "target") {
         return `**Target Identity:** \`${primaryUser}\`  
 **Target Host:** \`${primaryHost}\`  
-**Recommendation:** Terminate active sessions and enforce password rotation for account \`${primaryUser}\`.`;
+**Incident:** ${inc ? `INC-${inc.id}` : "Active Telemetry"}`;
     }
 
     // 3. Status / Severity inquiry
     if (msg.includes("status") || msg.includes("severity") || msg.includes("priority") || msg.includes("risk score")) {
         return `**Incident:** ${inc ? `INC-${inc.id} (${incidentTitle})` : "Active Telemetry"}  
-**Severity:** **${incidentSeverity}**  
+**Severity:** ${incidentSeverity}  
 **Status:** \`${inc?.status || "investigating"}\`  
-**Associated Alerts:** ${alerts.length || 1}`;
+**Alert Count:** ${alerts.length || 1}`;
     }
 
     // 4. Containment / Blocking / Firewall commands inquiry
     if (msg.includes("contain") || msg.includes("block") || msg.includes("firewall") || msg.includes("iptables") || msg.includes("isolate") || msg.includes("remediate") || msg.includes("rule")) {
-        return `### ⚡ [${role.name}] Firewall Containment Commands
-
-Execute on edge firewall or reverse proxy for adversary \`${primaryIp}\`:
-
-\`\`\`bash
-# Linux iptables: Drop all traffic from attacker source IP
+        return `\`\`\`bash
 sudo iptables -I INPUT 1 -s ${primaryIp} -j DROP
-sudo iptables -I FORWARD 1 -s ${primaryIp} -j DROP
-
-# Ubuntu UFW: Deny attacker source IP
-sudo ufw insert 1 deny from ${primaryIp} to any
-
-# Windows PowerShell (Admin):
-New-NetFirewallRule -DisplayName "SentinelX Block ${primaryIp}" -Direction Inbound -Action Block -RemoteAddress "${primaryIp}"
-\`\`\`
-
-> **Note:** To record this containment action into the incident audit trail, click **Execute** under the Response Actions tab.`;
+\`\`\``;
     }
 
     // 5. Blast Radius / Lateral Movement / Threat Hunting
     if (msg.includes("blast") || msg.includes("radius") || msg.includes("lateral") || msg.includes("hunt") || msg.includes("pivot") || msg.includes("patient zero")) {
-        return `### 🔍 [${role.name}] Blast Radius & Forensics
-
-* **Patient Zero:** Host \`${primaryHost}\` targeted by adversary \`${primaryIp}\`
-* **Entry Vector:** \`${rules[0] || "Exploit Public-Facing Application"}\`
-* **Compromised Account:** \`${primaryUser}\`
-* **Subnet Pivot Risk:** High — potential lateral scan across internal subnet
-
-#### Threat Hunting Query
-\`\`\`sql
-SELECT event_time, source_ip, hostname, action, message 
-FROM normalized_logs 
-WHERE username = '${primaryUser}' 
-ORDER BY event_time DESC LIMIT 20;
-\`\`\``;
+        return `**Patient Zero:** \`${primaryHost}\`  
+**Adversary IP:** \`${primaryIp}\`  
+**Target Account:** \`${primaryUser}\`  
+**Lateral Movement Risk:** ${alerts.length > 2 ? "HIGH" : "MEDIUM"}`;
     }
 
     // 6. Threat Intel / IoC / Attribution
     if (msg.includes("intel") || msg.includes("ioc") || msg.includes("reputation") || msg.includes("actor") || msg.includes("whois") || msg.includes("c2")) {
-        return `### 🌐 [${role.name}] Threat Intel & Indicators
-
-| Indicator | Type | Reputation | Confidence |
-|---|---|---|---|
-| \`${primaryIp}\` | IPv4 / External | **MALICIOUS** | 95% |
-| \`${primaryUser}\` | Target Account | Compromised Target | 90% |
-| \`${primaryHost}\` | Workload Asset | Target Endpoint | 85% |
-
-**MITRE ATT&CK:** ${mitre[0] ? `\`${mitre[0].technique_id}\` (${mitre[0].technique_name}) — *${mitre[0].tactic_name}*` : "`T1110` (Brute Force) — *Credential Access*"}`;
+        return `**Indicator:** \`${primaryIp}\` (IPv4)  
+**Reputation:** MALICIOUS (95% confidence)  
+**MITRE ATT&CK:** ${mitre[0] ? `\`${mitre[0].technique_id}\` (${mitre[0].technique_name})` : "`T1110` (Brute Force)"}`;
     }
 
     // 7. Executive Summary / Overview
     if (msg.includes("summary") || msg.includes("overview") || msg.includes("brief") || msg.includes("what happened")) {
-        return `### 📋 [${role.name}] Executive Incident Summary
-
-* **Incident:** ${inc ? `INC-${inc.id}: ${incidentTitle}` : "Active Threat Detection"} (**${incidentSeverity}**)
-* **Threat Activity:** Observed **\`${rules[0] || "Suspicious Activity"}\`** from source **\`${primaryIp}\`** targeting host **\`${primaryHost}\`**.
-* **Impacted Asset & User:** Workload \`${primaryHost}\` and account \`${primaryUser}\`.
-* **Action Required:** Block adversary IP \`${primaryIp}\` and revoke credentials for \`${primaryUser}\`.`;
+        return `${inc ? `INC-${inc.id}` : "Active Threat"}: Observed \`${rules[0] || "Suspicious Activity"}\` from source \`${primaryIp}\` targeting host \`${primaryHost}\` (\`${primaryUser}\`).`;
     }
 
-    // 8. General / Fallback (concise 2-to-3 sentence answer directly addressing telemetry)
-    return `**Context:** ${inc ? `INC-${inc.id} (${incidentTitle})` : "SentinelX SOC Telemetry"} | **Severity:** ${incidentSeverity}  
-Adversary telemetry confirms **\`${rules[0] || "Suspicious Activity"}\`** originating from **\`${primaryIp}\`** targeting host **\`${primaryHost}\`** (\`${primaryUser}\`).  
-Ask specifically for firewall rules, blast radius, IoC reputation, or an executive summary.`;
+    // 8. General / Fallback (concise direct answer)
+    return `**Incident:** ${inc ? `INC-${inc.id}` : "Active Telemetry"} | **Severity:** ${incidentSeverity}  
+Observed **\`${rules[0] || "Suspicious Activity"}\`** from source **\`${primaryIp}\`** targeting **\`${primaryHost}\`** (\`${primaryUser}\`).`;
+}
+
+function sanitizeCopilotContent(rawText) {
+    if (!rawText) return "";
+    let text = rawText.trim();
+    // Strip <think>...</think>
+    text = text.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+    // Strip "Here's a thinking process: ... \n\n" or "Thinking Process: ... \n\n"
+    text = text.replace(/^(?:Here's a thinking process:?|Thinking Process:?|Thought process:?)[\s\S]*?(?:\n\n|\r\n\r\n)/i, "").trim();
+    // If it started with "Here's a thinking process" and got cut off, discard and use deterministic fallback
+    if (/^(?:Here's a thinking process|Thinking Process)/i.test(text)) {
+        return "";
+    }
+    // If model returned a content safety classifier output or refusal
+    if (/^(?:User Safety: safe|Content Safety|I am unable to answer)/i.test(text)) {
+        return "";
+    }
+    return text;
 }
 
 /**
@@ -272,18 +254,19 @@ INCIDENT TELEMETRY:
                     content: `You are ${role.name} (${role.title}) in the SentinelX SOC platform.
 
 CRITICAL OPERATIONAL RULES:
-1. STRICT CONCISENESS — ANSWER ONLY WHAT WAS ASKED:
-   - Provide ONLY the direct data or answer requested by the analyst.
-   - Do NOT provide unrequested sections, multi-page templates, unsolicited containment playbooks, or general fluff.
-   - If the user asks for an IP, username, or rule, provide ONLY that specific data in 1-2 lines.
-   - If the user asks for firewall rules, provide ONLY the concise copy-pasteable commands for that IP.
-   - If the user asks for an analysis or summary, provide a concise response with at most 3-4 bullet points.
-   - Maximum response length must strictly remain under 120-150 words.
-2. CLEAN FORMATTING:
-   - Use clean, standard markdown.
-   - Use bullet points (- or *) for lists.
-   - Put IPs, usernames, rules, and commands in backticks or code blocks.
-   - For tabular data, use standard markdown tables (| Header | ...).
+1. ANSWER ONLY THE EXACT DATA POINT REQUESTED:
+   - If the analyst asks for an IP, output ONLY the adversary IP and target asset.
+   - If the analyst asks for a firewall rule or block command, output ONLY a single copy-pasteable bash command in a code block. Do NOT include other operating systems, explanations, or notes.
+   - If the analyst asks for username or identity, output ONLY the target username and host.
+   - If the analyst asks for status or severity, output ONLY the status and severity.
+   - If the analyst asks for an incident summary, output at most 1 to 2 factual sentences.
+   - NEVER provide unrequested sections, playbooks, or unsolicited advice.
+2. CLEAN KEY-VALUE FORMATTING:
+   - Format key attributes as concise "Key: Value" lines (e.g. "**Adversary IP:** \`1.2.3.4\`").
+   - NEVER output markdown heading markers ('#', '##', '###', '####').
+   - NEVER output markdown tables ('|---|---|').
+   - NEVER output conversational pleasantries ("Sure!", "Certainly!", "Here is...", "As an AI...").
+3. HARD LENGTH CEILING: Under 40 words total.
 
 ${contextSummary}`
                 },
@@ -302,8 +285,8 @@ ${contextSummary}`
                 {
                     model: process.env.OPENROUTER_MODEL || "deepseek/deepseek-chat",
                     messages,
-                    temperature: 0.2,
-                    max_tokens: 400
+                    temperature: 0.1,
+                    max_tokens: 180
                 },
                 {
                     headers: {
@@ -316,13 +299,14 @@ ${contextSummary}`
                 }
             );
 
-            const content = response.data?.choices?.[0]?.message?.content;
+            const rawContent = response.data?.choices?.[0]?.message?.content;
+            const content = sanitizeCopilotContent(rawContent);
             if (content && content.trim()) {
                 return {
                     response: content.trim(),
                     agent: role,
                     provider: "OpenRouter",
-                    model: process.env.OPENROUTER_MODEL || "deepseek/deepseek-chat",
+                    model: response.data?.model || process.env.OPENROUTER_MODEL || "deepseek/deepseek-chat",
                     timestamp: new Date().toISOString()
                 };
             }
