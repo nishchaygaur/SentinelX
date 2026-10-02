@@ -394,7 +394,7 @@ export default function MitreHeatmap({
                       else cellClass += " uncovered";
 
                       if (isSelected) cellClass += " selected";
-                      if (tech.incident_detected) cellClass += " incident-highlight";
+                      if (tech.incident_detected) cellClass += " mitre-incident-highlight";
 
                       return (
                         <div

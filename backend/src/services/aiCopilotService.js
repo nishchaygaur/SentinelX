@@ -133,11 +133,11 @@ async function assembleIncidentContext(incidentId) {
 
 /**
  * Deterministic Context-Aware Reasoning Engine
- * Provides instant, high-quality, authentic SOC analyst answers when OpenRouter is unreachable.
+ * Provides concise, precise, high-signal SOC analyst answers matching ONLY what the user asked.
  */
 function generateDeterministicCopilotResponse({ message, agentRole, incidentContext, generalContext }) {
     const role = SWARM_AGENTS[agentRole] || SWARM_AGENTS.swarm;
-    const msg = (message || "").toLowerCase();
+    const msg = (message || "").toLowerCase().trim();
     const inc = incidentContext?.incident;
     const alerts = incidentContext?.alerts || [];
     const mitre = incidentContext?.mitre || [];
@@ -155,123 +155,95 @@ function generateDeterministicCopilotResponse({ message, agentRole, incidentCont
     const incidentTitle = inc?.title || "Security Incident";
     const incidentSeverity = (inc?.severity || "critical").toUpperCase();
 
-    // 1. Containment / Blocking / Firewall commands request
-    if (msg.includes("contain") || msg.includes("block") || msg.includes("firewall") || msg.includes("iptables") || msg.includes("isolate") || msg.includes("remediate")) {
-        return `### ⚡ [${role.name}] Active Containment & SOAR Execution Runbook
+    // 1. IP / Attacker entity inquiry
+    if (msg.includes("what is the ip") || msg.includes("attacker ip") || msg.includes("source ip") || msg.includes("who is the attacker") || msg === "ip" || msg === "attacker") {
+        return `**Adversary IP:** \`${primaryIp}\`  
+**Target Asset:** \`${primaryHost}\`  
+**Trigger Rule:** \`${rules[0] || "Brute Force"}\`  
+**Incident:** ${inc ? `INC-${inc.id}` : "Active Telemetry"}`;
+    }
 
-**Target Incident:** ${inc ? `INC-${inc.id} (${incidentTitle})` : "Active Perimeter Threat"}  
-**Adversary IP:** \`${primaryIp}\` | **Affected Identity:** \`${primaryUser}\` | **Host:** \`${primaryHost}\`
+    // 2. User / Identity inquiry
+    if (msg.includes("user") || msg.includes("username") || msg.includes("account") || msg.includes("identity") || msg.includes("who logged in")) {
+        return `**Target Identity:** \`${primaryUser}\`  
+**Target Host:** \`${primaryHost}\`  
+**Recommendation:** Terminate active sessions and enforce password rotation for account \`${primaryUser}\`.`;
+    }
 
-#### 1. Network Boundary Quarantine (Instant Firewall Rule)
-Execute on the border firewall or host reverse proxy:
+    // 3. Status / Severity inquiry
+    if (msg.includes("status") || msg.includes("severity") || msg.includes("priority") || msg.includes("risk score")) {
+        return `**Incident:** ${inc ? `INC-${inc.id} (${incidentTitle})` : "Active Telemetry"}  
+**Severity:** **${incidentSeverity}**  
+**Status:** \`${inc?.status || "investigating"}\`  
+**Associated Alerts:** ${alerts.length || 1}`;
+    }
+
+    // 4. Containment / Blocking / Firewall commands inquiry
+    if (msg.includes("contain") || msg.includes("block") || msg.includes("firewall") || msg.includes("iptables") || msg.includes("isolate") || msg.includes("remediate") || msg.includes("rule")) {
+        return `### ⚡ [${role.name}] Firewall Containment Commands
+
+Execute on edge firewall or reverse proxy for adversary \`${primaryIp}\`:
+
 \`\`\`bash
-# Linux iptables: Immediately drop all traffic from attacker source IP
+# Linux iptables: Drop all traffic from attacker source IP
 sudo iptables -I INPUT 1 -s ${primaryIp} -j DROP
 sudo iptables -I FORWARD 1 -s ${primaryIp} -j DROP
 
-# Ubuntu UFW: Deny and log adversary
-sudo ufw insert 1 deny from ${primaryIp} to any comment "SentinelX-AutoContain-INC-${inc?.id || 1}"
+# Ubuntu UFW: Deny attacker source IP
+sudo ufw insert 1 deny from ${primaryIp} to any
 
-# Windows PowerShell (Run as Administrator):
+# Windows PowerShell (Admin):
 New-NetFirewallRule -DisplayName "SentinelX Block ${primaryIp}" -Direction Inbound -Action Block -RemoteAddress "${primaryIp}"
 \`\`\`
 
-#### 2. Identity & Session Termination
-\`\`\`bash
-# Kill active SSH sessions for target user
-sudo pkill -u ${primaryUser} -9
-
-# Lock compromised user credentials
-sudo passwd -l ${primaryUser}
-sudo usermod -L ${primaryUser}
-\`\`\`
-
-#### 3. Endpoint Isolation Protocol
-Isolate host \`${primaryHost}\` while preserving management telemetry to SentinelX:
-\`\`\`bash
-# Disallow all outbound lateral connections except SentinelX API
-sudo iptables -A OUTPUT -d 10.0.0.0/8 -j REJECT
-\`\`\`
-
-> **Recommendation:** Execute the **Simulate Block IP** action in the SentinelX Response tab to audit this action in the incident timeline.`;
+> **Note:** To record this containment action into the incident audit trail, click **Execute** under the Response Actions tab.`;
     }
 
-    // 2. Blast Radius / Lateral Movement / Threat Hunting
+    // 5. Blast Radius / Lateral Movement / Threat Hunting
     if (msg.includes("blast") || msg.includes("radius") || msg.includes("lateral") || msg.includes("hunt") || msg.includes("pivot") || msg.includes("patient zero")) {
-        return `### 🔍 [${role.name}] Blast Radius & Threat Hunter Report
+        return `### 🔍 [${role.name}] Blast Radius & Forensics
 
-**Incident Investigation:** ${inc ? `INC-${inc.id}` : "Fleet Forensics"} — ${incidentTitle}  
-**Investigation Scope:** 24-hour lookback across network and authentication telemetry.
+* **Patient Zero:** Host \`${primaryHost}\` targeted by adversary \`${primaryIp}\`
+* **Entry Vector:** \`${rules[0] || "Exploit Public-Facing Application"}\`
+* **Compromised Account:** \`${primaryUser}\`
+* **Subnet Pivot Risk:** High — potential lateral scan across internal subnet
 
-#### 🎯 Patient Zero & Initial Access Analysis
-* **Initial Access Vector:** \`${rules[0] || "Exploit Public-Facing Application"}\` observed originating from \`${primaryIp}\`.
-* **First Compromised Asset:** Host \`${primaryHost}\` targeting identity \`${primaryUser}\`.
-* **Associated Detection Rules:** ${rules.map(r => `\`${r}\``).join(", ") || "Known Attack Signatures"}.
-
-#### 🌐 Lateral Movement Risk Evaluation
-\`\`\`
-[Attacker: ${primaryIp}]
-        │ (Initial Breach / Authentication Probe)
-        ▼
-[Host: ${primaryHost}] ──► [Identity: ${primaryUser}]
-        │
-        ├─► SSH Sweep across internal subnet (Risk: HIGH)
-        ├─► Local Credential Harvesting (Mimikatz / SAM)
-        └─► Internal Pivot to Database / Backup Nodes (Pending Verification)
-\`\`\`
-
-#### 🔎 Recommended Threat Hunting Queries
-1. **Check for additional logins with compromised credentials:**
-   \`\`\`sql
-   SELECT event_time, source_ip, hostname, action, message 
-   FROM normalized_logs 
-   WHERE username = '${primaryUser}' AND event_time >= NOW() - INTERVAL '24 HOURS'
-   ORDER BY event_time DESC;
-   \`\`\`
-2. **Scan for newly established listening sockets or persistence:**
-   \`\`\`bash
-   sudo ss -tulpn | grep -E "nc|bash|python|sh"
-   sudo crontab -u ${primaryUser} -l
-   \`\`\``;
+#### Threat Hunting Query
+\`\`\`sql
+SELECT event_time, source_ip, hostname, action, message 
+FROM normalized_logs 
+WHERE username = '${primaryUser}' 
+ORDER BY event_time DESC LIMIT 20;
+\`\`\``;
     }
 
-    // 3. Threat Intel / IoC / Attribution
+    // 6. Threat Intel / IoC / Attribution
     if (msg.includes("intel") || msg.includes("ioc") || msg.includes("reputation") || msg.includes("actor") || msg.includes("whois") || msg.includes("c2")) {
-        return `### 🌐 [${role.name}] Cyber Threat Intelligence & IoC Dossier
+        return `### 🌐 [${role.name}] Threat Intel & Indicators
 
-**Subject:** Intelligence assessment for threat infrastructure identified in ${inc ? `INC-${inc.id}` : "current alerts"}.
+| Indicator | Type | Reputation | Confidence |
+|---|---|---|---|
+| \`${primaryIp}\` | IPv4 / External | **MALICIOUS** | 95% |
+| \`${primaryUser}\` | Target Account | Compromised Target | 90% |
+| \`${primaryHost}\` | Workload Asset | Target Endpoint | 85% |
 
-#### 🚩 Verified IoC Artifacts
-| Indicator | Type | Reputation | Threat Attribution | Confidence |
-|---|---|---|---|---|
-| \`${primaryIp}\` | IPv4 / External | **MALICIOUS (High Risk)** | Automated Exploit Botnet / C2 Node | 95% |
-| \`${primaryUser}\` | Target Identity | **Compromised Target** | Service / Admin Account | 90% |
-| \`${primaryHost}\` | Workload Asset | **Target Endpoint** | Production Web Tier | 85% |
-
-#### 🗺️ MITRE ATT&CK Adversary Profiling
-${mitre.length ? mitre.map(m => `* **${m.technique_id} (${m.technique_name})**: Tactic *${m.tactic_name}* — ${m.description}`).join("\n") : `* **T1190 (Exploit Public-Facing Application)**: Web server penetration targeting database backends.
-* **T1110 (Brute Force)**: Systematic credential guessing attacks.
-* **T1059.001 (PowerShell)**: Malicious command interpreter abuse.`}
-
-#### 🛡️ Threat Landscape Context
-Adversary behavior matches known automated adversary scan-and-exploit campaigns. The source IP exhibits repeat reconnaissance patterns across multiple open-source threat intelligence feeds (AbuseIPDB, AlienVault OTX). Immediate perimeter blocking is mandated.`;
+**MITRE ATT&CK:** ${mitre[0] ? `\`${mitre[0].technique_id}\` (${mitre[0].technique_name}) — *${mitre[0].tactic_name}*` : "`T1110` (Brute Force) — *Credential Access*"}`;
     }
 
-    // 4. Default / General SOC Copilot Synthesis (Swarm Consensus)
-    return `### 🤖 [${role.name}] SOC Analysis & Operational Guidance
+    // 7. Executive Summary / Overview
+    if (msg.includes("summary") || msg.includes("overview") || msg.includes("brief") || msg.includes("what happened")) {
+        return `### 📋 [${role.name}] Executive Incident Summary
 
-**Context:** ${inc ? `INC-${inc.id} (${incidentTitle})` : "SentinelX SOC Telemetry"}  
-**Status:** **${incidentSeverity} SEVERITY** | **Associated Alerts:** ${alerts.length || 1}
+* **Incident:** ${inc ? `INC-${inc.id}: ${incidentTitle}` : "Active Threat Detection"} (**${incidentSeverity}**)
+* **Threat Activity:** Observed **\`${rules[0] || "Suspicious Activity"}\`** from source **\`${primaryIp}\`** targeting host **\`${primaryHost}\`**.
+* **Impacted Asset & User:** Workload \`${primaryHost}\` and account \`${primaryUser}\`.
+* **Action Required:** Block adversary IP \`${primaryIp}\` and revoke credentials for \`${primaryUser}\`.`;
+    }
 
-#### 📋 Executive Assessment
-1. **Adversary Activity:** Telemetry confirms anomalous behavior triggered by **${rules[0] || "Security Detection Rule"}** originating from source **\`${primaryIp}\`**.
-2. **Technique Association:** Mapped to MITRE ATT&CK **${mitre[0]?.technique_id || "T1190"}** (*${mitre[0]?.technique_name || "Adversary TTP"}*).
-3. **Immediate Risk:** Credential compromise and potential lateral movement if active sessions are left uncontained.
-
-#### 🛠️ Recommended Next Steps
-* **Immediate Response:** Issue network ban on \`${primaryIp}\` and terminate active sessions for user \`${primaryUser}\`.
-* **Deep Investigation:** Run the **Autonomous Swarm Investigation** below to extract cross-agent insights from Triage, Threat Hunter, Intel, and Responder.
-* **Audit Trail:** Use the button below to log these findings directly into the incident timeline.`;
+    // 8. General / Fallback (concise 2-to-3 sentence answer directly addressing telemetry)
+    return `**Context:** ${inc ? `INC-${inc.id} (${incidentTitle})` : "SentinelX SOC Telemetry"} | **Severity:** ${incidentSeverity}  
+Adversary telemetry confirms **\`${rules[0] || "Suspicious Activity"}\`** originating from **\`${primaryIp}\`** targeting host **\`${primaryHost}\`** (\`${primaryUser}\`).  
+Ask specifically for firewall rules, blast radius, IoC reputation, or an executive summary.`;
 }
 
 /**
@@ -281,33 +253,39 @@ async function chatWithCopilot({ message, incidentId, agentRole = "swarm", histo
     const role = SWARM_AGENTS[agentRole] || SWARM_AGENTS.swarm;
     const incidentContext = await assembleIncidentContext(incidentId);
 
-    // If OpenRouter API key is configured, query the LLM with structured SOC prompt
+    // If OpenRouter API key is configured, query the LLM with concise, structured SOC prompt
     if (process.env.OPENROUTER_API_KEY && !process.env.OPENROUTER_API_KEY.includes("dummy")) {
         try {
-            const contextPrompt = incidentContext ? `
-CURRENT ACTIVE INCIDENT IN SENTINELX:
-- Incident ID: INC-${incidentContext.incident.id}
+            const contextSummary = incidentContext ? `
+INCIDENT TELEMETRY:
+- ID: INC-${incidentContext.incident.id} | Severity: ${incidentContext.incident.severity} | Status: ${incidentContext.incident.status}
 - Title: ${incidentContext.incident.title}
-- Severity: ${incidentContext.incident.severity}
-- Status: ${incidentContext.incident.status}
-- Summary: ${incidentContext.incident.description}
-- Associated Alerts (${incidentContext.alerts.length}):
-${incidentContext.alerts.map(a => `  * Alert #${a.id} [${a.severity}] ${a.title} | Rule: ${a.detection_rule} | IP: ${a.source_ip || "N/A"} | User: ${a.username || "N/A"}`).join("\n")}
-- MITRE Techniques: ${incidentContext.mitre.map(m => `${m.technique_id} (${m.technique_name})`).join(", ") || "None"}
-- Threat Intel IoCs: ${incidentContext.threatIntel.map(t => `${t.indicator_value} [${t.reputation}]`).join(", ") || "None"}
-` : "No specific incident is currently selected. Answer as an enterprise SOC copilot with general platform context.";
+- Source IP: ${incidentContext.alerts[0]?.source_ip || "N/A"} | Target Host: ${incidentContext.alerts[0]?.hostname || "N/A"} | User: ${incidentContext.alerts[0]?.username || "N/A"}
+- Detection Rule: ${incidentContext.alerts[0]?.detection_rule || "N/A"}
+- MITRE: ${incidentContext.mitre.map(m => `${m.technique_id} (${m.technique_name})`).join(", ") || "None"}
+- IoCs: ${incidentContext.threatIntel.map(t => `${t.indicator_value} [${t.reputation}]`).join(", ") || "None"}
+` : "No specific incident is currently selected.";
 
             const messages = [
                 {
                     role: "system",
-                    content: `${role.systemPrompt}
+                    content: `You are ${role.name} (${role.title}) in the SentinelX SOC platform.
 
-You are part of the SentinelX AI Multi-Agent SOC platform.
-Provide actionable, technical, authoritative responses formatted in GitHub-flavored Markdown.
-When discussing remediation, provide exact terminal commands (iptables, PowerShell, UFW).
-Include MITRE ATT&CK technique IDs where relevant.
+CRITICAL OPERATIONAL RULES:
+1. STRICT CONCISENESS — ANSWER ONLY WHAT WAS ASKED:
+   - Provide ONLY the direct data or answer requested by the analyst.
+   - Do NOT provide unrequested sections, multi-page templates, unsolicited containment playbooks, or general fluff.
+   - If the user asks for an IP, username, or rule, provide ONLY that specific data in 1-2 lines.
+   - If the user asks for firewall rules, provide ONLY the concise copy-pasteable commands for that IP.
+   - If the user asks for an analysis or summary, provide a concise response with at most 3-4 bullet points.
+   - Maximum response length must strictly remain under 120-150 words.
+2. CLEAN FORMATTING:
+   - Use clean, standard markdown.
+   - Use bullet points (- or *) for lists.
+   - Put IPs, usernames, rules, and commands in backticks or code blocks.
+   - For tabular data, use standard markdown tables (| Header | ...).
 
-${contextPrompt}`
+${contextSummary}`
                 },
                 ...history.slice(-4).map(h => ({
                     role: h.sender === "user" ? "user" : "assistant",
@@ -324,7 +302,8 @@ ${contextPrompt}`
                 {
                     model: process.env.OPENROUTER_MODEL || "deepseek/deepseek-chat",
                     messages,
-                    temperature: 0.3
+                    temperature: 0.2,
+                    max_tokens: 400
                 },
                 {
                     headers: {
@@ -352,7 +331,7 @@ ${contextPrompt}`
         }
     }
 
-    // Deterministic fallback engine for instant, reliable responses
+    // Deterministic fallback engine for instant, reliable, scoped responses
     const deterministicText = generateDeterministicCopilotResponse({
         message,
         agentRole,

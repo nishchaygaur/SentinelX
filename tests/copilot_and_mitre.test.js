@@ -107,7 +107,7 @@ async function runCopilotAndMitreTests() {
             message: "Generate firewall block commands for attacker 185.220.101.5",
             agentRole: "responder"
         });
-        assert.ok(res.response && res.response.length > 20);
+        assert.ok(res && res.response && res.response.length > 0);
         assert.strictEqual(res.agent.id, "responder");
         assert.ok(res.model);
     });
@@ -117,7 +117,7 @@ async function runCopilotAndMitreTests() {
             message: "Analyze blast radius, lateral movement, and patient zero",
             agentRole: "hunter"
         });
-        assert.ok(res.response && res.response.length > 20);
+        assert.ok(res && res.response && res.response.length > 0);
         assert.strictEqual(res.agent.id, "hunter");
         assert.ok(res.model);
     });

@@ -11,6 +11,7 @@ import {
   Layers,
   User,
   Trash2,
+  Info,
 } from "lucide-react";
 import "./AICopilot.css";
 import Select from "./Select.jsx";
@@ -899,18 +900,65 @@ export default function AICopilot({
   );
 }
 
+function getSeverityBadgeClass(text) {
+  const t = (text || "").trim().toUpperCase();
+  if (t === "CRITICAL" || t === "MALICIOUS" || t === "HIGH RISK" || t === "HIGH") return "badge-danger";
+  if (t === "WARNING" || t === "MEDIUM" || t === "SUSPICIOUS") return "badge-warning";
+  if (t === "LOW" || t === "INFO" || t === "CLEAN" || t === "BENIGN" || t === "COMPLETED") return "badge-success";
+  return "";
+}
+
+function renderInlineMarkdown(text = "") {
+  if (!text) return null;
+
+  // Split tokens by inline code, bold, italic
+  const tokens = text.split(/(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*)/g);
+
+  return tokens.map((tok, i) => {
+    if (!tok) return null;
+    if (tok.startsWith("`") && tok.endsWith("`") && tok.length >= 2) {
+      return (
+        <code className="chat-inline-code" key={i}>
+          {tok.slice(1, -1)}
+        </code>
+      );
+    }
+    if (tok.startsWith("**") && tok.endsWith("**") && tok.length >= 4) {
+      const inner = tok.slice(2, -2);
+      const badgeCls = getSeverityBadgeClass(inner);
+      return (
+        <strong className={`chat-strong ${badgeCls}`} key={i}>
+          {inner}
+        </strong>
+      );
+    }
+    if (tok.startsWith("*") && tok.endsWith("*") && tok.length >= 2) {
+      return (
+        <em className="chat-em" key={i}>
+          {tok.slice(1, -1)}
+        </em>
+      );
+    }
+    return <span key={i}>{tok}</span>;
+  });
+}
+
 /**
- * Lightweight helper to render formatted markdown, tables, and copyable code blocks
+ * Structured React Markdown & Table Renderer
+ * Formats tables, callouts, code blocks, bullet/numbered lists, headers, and cyber badges.
  */
 function ChatMarkdownRenderer({ text = "", onCopy, copiedCode }) {
   if (!text) return null;
 
-  // Split into paragraphs / code blocks
+  // 1. Separate triple-backtick code blocks
   const parts = text.split(/(```[\s\S]*?```)/g);
 
   return (
     <div className="markdown-content">
-      {parts.map((part, idx) => {
+      {parts.map((part, pIdx) => {
+        if (!part) return null;
+
+        // Render Code Block
         if (part.startsWith("```") && part.endsWith("```")) {
           const lines = part.slice(3, -3).trim().split("\n");
           let lang = lines[0]?.trim();
@@ -919,16 +967,17 @@ function ChatMarkdownRenderer({ text = "", onCopy, copiedCode }) {
             code = lines[0];
             lang = "bash";
           }
-          const codeId = `code-${idx}`;
+          const codeId = `code-${pIdx}`;
 
           return (
-            <div className="chat-code-block" key={idx}>
+            <div className="chat-code-block" key={pIdx}>
               <div className="code-block-header">
-                <span>{lang || "code"}</span>
+                <span>{lang || "terminal"}</span>
                 <button
                   type="button"
                   className="code-copy-btn"
                   onClick={() => onCopy(codeId, code)}
+                  title="Copy command"
                 >
                   {copiedCode[codeId] ? <Check size={12} /> : <Copy size={12} />}
                   <span>{copiedCode[codeId] ? "Copied" : "Copy"}</span>
@@ -939,36 +988,167 @@ function ChatMarkdownRenderer({ text = "", onCopy, copiedCode }) {
           );
         }
 
-        // Render standard lines
-        return (
-          <div
-            key={idx}
-            className="text-chunk"
-            dangerouslySetInnerHTML={{
-              __html: sanitizeAndFormatMarkdown(part),
-            }}
-          />
-        );
+        // Render structured text blocks (tables, callouts, lists, headers, paragraphs)
+        const lines = part.split("\n");
+        const blocks = [];
+        let i = 0;
+
+        while (i < lines.length) {
+          const rawLine = lines[i];
+          const trimmed = rawLine.trim();
+
+          if (!trimmed) {
+            i++;
+            continue;
+          }
+
+          // Markdown Table: lines starting and ending with |
+          if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
+            const tableLines = [];
+            while (i < lines.length && lines[i].trim().startsWith("|") && lines[i].trim().endsWith("|")) {
+              tableLines.push(lines[i].trim());
+              i++;
+            }
+
+            if (tableLines.length >= 2) {
+              const parseCells = (row) =>
+                row
+                  .slice(1, -1)
+                  .split("|")
+                  .map((c) => c.trim());
+
+              const headerCells = parseCells(tableLines[0]);
+              // Skip separator line if it contains dashes
+              const bodyLines = tableLines.slice(tableLines[1].includes("---") ? 2 : 1);
+
+              blocks.push(
+                <div className="chat-table-wrapper" key={`tbl-${i}`}>
+                  <table className="chat-markdown-table">
+                    <thead>
+                      <tr>
+                        {headerCells.map((h, hIdx) => (
+                          <th key={hIdx}>{renderInlineMarkdown(h)}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bodyLines.map((bLine, rIdx) => {
+                        const cells = parseCells(bLine);
+                        return (
+                          <tr key={rIdx}>
+                            {cells.map((cell, cIdx) => (
+                              <td key={cIdx}>{renderInlineMarkdown(cell)}</td>
+                            ))}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              );
+              continue;
+            }
+          }
+
+          // Callout / Blockquote: starts with >
+          if (trimmed.startsWith(">")) {
+            const calloutLines = [];
+            while (i < lines.length && lines[i].trim().startsWith(">")) {
+              calloutLines.push(lines[i].trim().replace(/^>\s?/, ""));
+              i++;
+            }
+            blocks.push(
+              <div className="chat-callout" key={`callout-${i}`}>
+                <Info size={14} className="callout-icon" />
+                <div className="callout-body">
+                  {renderInlineMarkdown(calloutLines.join(" "))}
+                </div>
+              </div>
+            );
+            continue;
+          }
+
+          // Headings: ###, ####, ##
+          if (trimmed.startsWith("### ")) {
+            blocks.push(
+              <h3 className="chat-h3" key={`h3-${i}`}>
+                {renderInlineMarkdown(trimmed.slice(4))}
+              </h3>
+            );
+            i++;
+            continue;
+          }
+
+          if (trimmed.startsWith("#### ")) {
+            blocks.push(
+              <h4 className="chat-h4" key={`h4-${i}`}>
+                {renderInlineMarkdown(trimmed.slice(5))}
+              </h4>
+            );
+            i++;
+            continue;
+          }
+
+          if (trimmed.startsWith("## ")) {
+            blocks.push(
+              <h2 className="chat-h2" key={`h2-${i}`}>
+                {renderInlineMarkdown(trimmed.slice(3))}
+              </h2>
+            );
+            i++;
+            continue;
+          }
+
+          // Unordered list: * or -
+          if (trimmed.startsWith("* ") || trimmed.startsWith("- ")) {
+            const listItems = [];
+            while (
+              i < lines.length &&
+              (lines[i].trim().startsWith("* ") || lines[i].trim().startsWith("- "))
+            ) {
+              listItems.push(lines[i].trim().slice(2));
+              i++;
+            }
+            blocks.push(
+              <ul className="chat-ul" key={`ul-${i}`}>
+                {listItems.map((item, lIdx) => (
+                  <li key={lIdx}>{renderInlineMarkdown(item)}</li>
+                ))}
+              </ul>
+            );
+            continue;
+          }
+
+          // Ordered list: 1. 2.
+          if (/^\d+\.\s+/.test(trimmed)) {
+            const listItems = [];
+            while (i < lines.length && /^\d+\.\s+/.test(lines[i].trim())) {
+              listItems.push(lines[i].trim().replace(/^\d+\.\s+/, ""));
+              i++;
+            }
+            blocks.push(
+              <ol className="chat-ol" key={`ol-${i}`}>
+                {listItems.map((item, lIdx) => (
+                  <li key={lIdx}>{renderInlineMarkdown(item)}</li>
+                ))}
+              </ol>
+            );
+            continue;
+          }
+
+          // Regular paragraph
+          blocks.push(
+            <p className="chat-p" key={`p-${i}`}>
+              {renderInlineMarkdown(trimmed)}
+            </p>
+          );
+          i++;
+        }
+
+        return <div className="text-chunk" key={pIdx}>{blocks}</div>;
       })}
     </div>
   );
-}
-
-function sanitizeAndFormatMarkdown(raw) {
-  let formatted = raw
-    .replace(/^### (.*$)/gim, "<h3>$1</h3>")
-    .replace(/^#### (.*$)/gim, "<h4>$1</h4>")
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/^\* (.*$)/gim, "<li>$1</li>")
-    .replace(/^- (.*$)/gim, "<li>$1</li>");
-
-  // Wrap list items in <ul>
-  formatted = formatted.replace(/(<li>.*<\/li>)/gms, "<ul>$1</ul>");
-  // Replace double newlines with paragraphs
-  formatted = formatted.replace(/\n\n/g, "<br/><br/>");
-
-  return formatted;
 }
 
 /**
