@@ -1,3 +1,14 @@
+:root {
+  --font-xs: 11px;
+  --font-sm: 12px;
+  --font-base: 13px;
+  --font-md: 14px;
+  --font-h3: 15px;
+  --font-h2: 18px;
+  --font-h1: 20px;
+  --font-display: 24px;
+}
+
 * {
   box-sizing: border-box;
 }

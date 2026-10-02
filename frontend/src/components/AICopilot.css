@@ -111,7 +111,7 @@
 
 .agent-count-pill,
 .chat-badge {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   background: #202938;
   color: #cbd5e1;
@@ -176,14 +176,14 @@
 }
 
 .agent-badge {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
   display: block;
 }
 
 .agent-card-header h4 {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   color: #f1f5f9;
   margin: 1px 0 0;
@@ -324,7 +324,7 @@
 }
 
 .consensus-icon {
-  font-size: 28px;
+  font-size: 24px;
   flex-shrink: 0;
 }
 
@@ -398,7 +398,7 @@
 }
 
 .verdict-card .label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   color: #8995a8;
@@ -406,7 +406,7 @@
 }
 
 .verdict-value {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   margin-top: 4px;
 }
@@ -516,7 +516,7 @@
   color: #f87171;
   padding: 2px 8px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -591,7 +591,7 @@
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: 700;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .mitre-tags-list {
@@ -623,7 +623,7 @@
 
 .tag-tactic {
   color: #64748b;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 /* Command Cards */
@@ -648,7 +648,7 @@
 }
 
 .action-label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: #e2e8f0;
 }
@@ -782,7 +782,7 @@
 }
 
 .chips-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   color: #64748b;
@@ -880,7 +880,7 @@
 }
 
 .chat-badge-pill {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   background: rgba(56, 189, 248, 0.15);
   color: #38bdf8;
@@ -889,7 +889,7 @@
 }
 
 .chat-timestamp {
-  font-size: 10px;
+  font-size: 11px;
   color: #64748b;
   margin-left: auto;
 }
@@ -1083,7 +1083,7 @@
   padding: 4px 10px;
   background: #111724;
   border-bottom: 1px solid #1c2636;
-  font-size: 10px;
+  font-size: 11px;
   font-family: monospace;
   color: #8995a8;
   text-transform: uppercase;
@@ -1096,7 +1096,7 @@
   background: transparent;
   border: none;
   color: #38bdf8;
-  font-size: 10px;
+  font-size: 11px;
   cursor: pointer;
   padding: 2px 6px;
   border-radius: 3px;

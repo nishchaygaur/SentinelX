@@ -130,7 +130,7 @@
   border-radius: 10px;
   background: linear-gradient(135deg, #7c5cff, #3b82f6);
   color: white;
-  font-size: 23px;
+  font-size: 20px;
   box-shadow: 0 0 25px rgba(124, 92, 255, 0.3);
 }
 
@@ -161,6 +161,7 @@
   border-radius: 7px;
   background: #111722;
   color: #b7c1d1;
+  font-size: 12px;
   cursor: pointer;
 }
 
@@ -192,7 +193,7 @@
 .section-label {
   padding: 0 11px 9px;
   color: #4f5c70;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 1.4px;
 }
@@ -241,7 +242,7 @@
   border-radius: 5px;
   background: #20283a;
   text-align: center;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .sidebar-bottom {
@@ -263,14 +264,14 @@
 }
 
 .engine-status strong {
-  font-size: 11px;
+  font-size: 12px;
   color: #a7b1c1;
 }
 
 .engine-status small {
   margin-top: 2px;
   color: #4e9e72;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 /* MAIN */
@@ -297,13 +298,13 @@
 
 .page-header h2 {
   margin: 0;
-  font-size: 25px;
+  font-size: 24px;
 }
 
 .page-header p {
   margin: 6px 0 0;
   color: #667387;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .live-indicator {
@@ -311,7 +312,7 @@
   align-items: center;
   gap: 7px;
   color: #50d88a;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
 }
@@ -343,7 +344,7 @@
 
 .metric-value {
   margin-top: 8px;
-  font-size: 27px;
+  font-size: 24px;
   font-weight: 700;
 }
 
@@ -401,7 +402,7 @@
 
 .eyebrow {
   color: #657186;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 1.4px;
   font-weight: 700;
   margin-bottom: 7px;
@@ -421,7 +422,7 @@
   height: fit-content;
   padding: 5px 9px;
   border-radius: 5px;
-  font-size: 10px;
+  font-size: 11px;
   text-transform: uppercase;
   font-weight: 700;
 }
@@ -438,7 +439,7 @@
 
 .incident-description {
   color: #8a96a8;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.6;
   margin: 14px 0 18px;
 }
@@ -457,7 +458,7 @@
 .detail span {
   display: block;
   color: #526075;
-  font-size: 9px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   margin-bottom: 4px;
@@ -467,7 +468,7 @@
   display: block;
   overflow: hidden;
   color: #bdc6d4;
-  font-size: 11px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -502,7 +503,7 @@
 
 .panel-title h3 {
   margin: 0;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .panel-icon {
@@ -515,7 +516,7 @@
   border-radius: 5px;
   background: #182033;
   color: #8491a5;
-  font-size: 10px;
+  font-size: 11px;
   text-align: center;
 }
 
@@ -534,12 +535,12 @@
 
 .alert-title-row h4 {
   margin: 0 0 5px;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .rule {
   color: #59677b;
-  font-size: 9px;
+  font-size: 11px;
   font-family: monospace;
 }
 
@@ -548,13 +549,13 @@
   border-radius: 5px;
   background: #35171d;
   color: #ff6b79;
-  font-size: 9px;
+  font-size: 11px;
   white-space: nowrap;
 }
 
 .alert-content > p {
   color: #7d899b;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.6;
   margin: 15px 0;
 }
@@ -580,7 +581,7 @@
   background: #1c1930;
   color: #9d83f8;
   font-family: monospace;
-  font-size: 10px;
+  font-size: 11px;
   text-align: center;
 }
 
@@ -594,13 +595,13 @@
 }
 
 .mitre-info strong {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .mitre-info span {
   margin-top: 3px;
   color: #59667a;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .mitre-arrow {
@@ -624,7 +625,7 @@
 
 .indicator-type,
 .suspicious {
-  font-size: 9px;
+  font-size: 11px;
   text-transform: uppercase;
   font-weight: 700;
 }
@@ -648,7 +649,7 @@
   display: flex;
   justify-content: space-between;
   color: #566378;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .intel-meta strong {
@@ -657,7 +658,7 @@
 
 .intel-card p {
   color: #687589;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -673,7 +674,7 @@
   gap: 7px;
   margin: 14px 0;
   color: #8878c4;
-  font-size: 9px;
+  font-size: 11px;
   font-family: monospace;
 }
 
@@ -691,7 +692,7 @@
 .ai-block h4 {
   margin: 0 0 5px;
   color: #a68cf9;
-  font-size: 10px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.7px;
 }
@@ -699,7 +700,7 @@
 .ai-block p {
   margin: 0;
   color: #808c9e;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.6;
 }
 
@@ -726,13 +727,13 @@
   border-radius: 50%;
   background: #1c1930;
   color: #9c82f5;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .step p {
   margin: 2px 0;
   color: #7f8b9d;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.6;
 }
 
@@ -759,7 +760,7 @@
   border-radius: 50%;
   background: #143025;
   color: #50d58b;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .response-info {
@@ -767,20 +768,20 @@
 }
 
 .response-info strong {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .response-info p {
   margin: 4px 0;
   color: #69768a;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
 .response-info small {
   display: block;
   color: #4f8067;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -789,7 +790,7 @@
   border-radius: 4px;
   background: #14291f;
   color: #4fcf88;
-  font-size: 8px;
+  font-size: 11px;
   text-transform: uppercase;
 }
 
@@ -798,7 +799,7 @@
 .empty-state {
   padding: 30px 10px;
   color: #4d596c;
-  font-size: 10px;
+  font-size: 12px;
   text-align: center;
 }
 
@@ -811,7 +812,7 @@ footer {
   padding: 15px 2px;
   border-top: 1px solid #1b2330;
   color: #465266;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 /* RESPONSIVE */
@@ -1028,7 +1029,7 @@ button.table-row:hover {
   display: block;
   overflow: hidden;
   color: #dce3ed;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1041,7 +1042,7 @@ button.table-row:hover {
   margin-top: 4px;
   overflow: hidden;
   color: #59667a;
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.4;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1065,7 +1066,7 @@ button.table-row:hover {
 .risk-score {
   min-width: 28px;
   color: #c5cedb;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   text-align: right;
 }
@@ -1076,10 +1077,10 @@ button.table-row:hover {
   align-items: center;
   justify-content: center;
   width: fit-content;
-  min-height: 20px;
-  padding: 3px 7px;
+  min-height: 22px;
+  padding: 3px 8px;
   border-radius: 5px;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: .4px;
   text-transform: uppercase;
@@ -1130,12 +1131,12 @@ button.table-row:hover {
 
 .incident-highlight h3 {
   margin: 0 0 7px;
-  font-size: 16px;
+  font-size: 18px;
 }
 .incident-highlight p {
   margin: 0;
   color: #788497;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.55;
 }
 .incident-highlight-meta {
@@ -1145,7 +1146,7 @@ button.table-row:hover {
 }
 .incident-highlight-meta strong {
   color: #a999ef;
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -1185,12 +1186,12 @@ button.table-row:hover {
 .alert-card-header > div > span {
   color: #59667a;
   font-family: monospace;
-  font-size: 9px;
+  font-size: 11px;
 }
 .alert-card-main > p {
   margin: 13px 0 16px;
   color: #7d899b;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.6;
 }
 .alert-meta-grid {
@@ -1219,7 +1220,7 @@ button.table-row:hover {
   padding: 0 14px;
   border-radius: 7px;
   font-family: inherit;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -1397,7 +1398,7 @@ button.table-row:hover {
   border-radius: 7px;
   color: #e2e8f0;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
@@ -1430,7 +1431,7 @@ button.table-row:hover {
   border-radius: 8px;
   color: #e2e8f0;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.6;
   outline: none;
   resize: vertical;
@@ -1508,13 +1509,13 @@ button.table-row:hover {
 .incident-select strong {
   display: block;
   color: #dce3ed;
-  font-size: 11px;
+  font-size: 13px;
 }
 .incident-select small {
   display: block;
   margin-top: 4px;
   color: #59667a;
-  font-size: 9px;
+  font-size: 11px;
 }
 .investigation-header {
   display: flex;
@@ -1529,7 +1530,7 @@ button.table-row:hover {
 .investigation-description {
   margin: 13px 0 18px;
   color: #7f8b9d;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.6;
 }
 .detail-grid {
@@ -1561,7 +1562,7 @@ button.table-row:hover {
   border-bottom: 1px solid #17202d;
   color: #9d83f8;
 }
-.investigation-block-title h4 { margin: 0; color: #d7deea; font-size: 11px; }
+.investigation-block-title h4 { margin: 0; color: #d7deea; font-size: 13px; }
 .intel-row {
   display: flex;
   align-items: flex-start;
@@ -1576,11 +1577,11 @@ button.table-row:hover {
   border-radius: 4px;
   background: #1c1930;
   color: #9d83f8;
-  font-size: 9px;
+  font-size: 11px;
 }
 .intel-row div { min-width: 0; }
-.intel-row strong { display: block; color: #cbd4e1; font-size: 10px; }
-.intel-row small { display: block; margin-top: 3px; color: #59667a; font-size: 9px; }
+.intel-row strong { display: block; color: #cbd4e1; font-size: 13px; }
+.intel-row small { display: block; margin-top: 3px; color: #59667a; font-size: 11px; }
 
 /* THREAT INTELLIGENCE */
 .intel-grid,
@@ -1603,7 +1604,7 @@ button.table-row:hover {
   justify-content: space-between;
   gap: 12px;
   color: #68758a;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -1615,8 +1616,8 @@ button.table-row:hover {
   font-size: 13px;
   overflow-wrap: anywhere;
 }
-.intel-large-card h4 { margin: 0 0 7px; color: #e0e6ef; font-size: 14px; }
-.intel-large-card p { margin: 0; color: #687589; font-size: 10px; line-height: 1.55; }
+.intel-large-card h4 { margin: 0 0 7px; color: #e0e6ef; font-size: 15px; }
+.intel-large-card p { margin: 0; color: #687589; font-size: 12px; line-height: 1.55; }
 .intel-card-footer {
   display: flex;
   justify-content: space-between;
@@ -1625,7 +1626,7 @@ button.table-row:hover {
   padding-top: 10px;
   border-top: 1px solid #17202d;
   color: #566378;
-  font-size: 9px;
+  font-size: 11px;
 }
 .intel-card-footer strong { color: #9ba6b6; }
 
@@ -1638,11 +1639,11 @@ button.table-row:hover {
   background: #1c1930;
   color: #a68cf9;
   font-family: monospace;
-  font-size: 10px;
+  font-size: 11px;
 }
 .mitre-card h3 { margin: 12px 0 5px; color: #e1e7ef; font-size: 15px; }
-.mitre-card > span { color: #59667a; font-size: 9px; }
-.mitre-card p { margin: 12px 0 0; color: #778397; font-size: 10px; line-height: 1.55; }
+.mitre-card > span { color: #59667a; font-size: 11px; }
+.mitre-card p { margin: 12px 0 0; color: #778397; font-size: 12px; line-height: 1.55; }
 
 /* AI */
 .ai-analysis-card { margin-bottom: 15px; border-color: #292044; }
@@ -1652,7 +1653,7 @@ button.table-row:hover {
   justify-content: space-between;
   gap: 20px;
 }
-.ai-analysis-header h3 { margin: 0; font-size: 17px; }
+.ai-analysis-header h3 { margin: 0; font-size: 18px; }
 .ai-analysis-header .ai-provider { margin: 0; }
 .ai-analysis-grid {
   display: grid;
@@ -1667,12 +1668,12 @@ button.table-row:hover {
   margin: 7px 0 0;
   padding-left: 22px;
   color: #8793a5;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.7;
 }
 .ai-block li { padding-left: 4px; margin-bottom: 5px; }
-.ai-summary h4 { margin: 12px 0 5px; color: #a68cf9; font-size: 10px; text-transform: uppercase; }
-.ai-summary p { margin: 0; color: #808c9e; font-size: 10px; line-height: 1.6; }
+.ai-summary h4 { margin: 12px 0 5px; color: #a68cf9; font-size: 11px; text-transform: uppercase; }
+.ai-summary p { margin: 0; color: #808c9e; font-size: 12px; line-height: 1.6; }
 
 /* REPORTS */
 .reports-grid {
@@ -1709,12 +1710,12 @@ button.table-row:hover {
   color: #a68cf9;
 }
 .report-card > div { min-width: 0; }
-.report-card span { color: #59667a; font-family: monospace; font-size: 9px; }
+.report-card span { color: #59667a; font-family: monospace; font-size: 11px; }
 .report-card h3 {
   margin: 5px 0;
   overflow: hidden;
   color: #dce3ed;
-  font-size: 13px;
+  font-size: 15px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1722,7 +1723,7 @@ button.table-row:hover {
   margin: 0;
   overflow: hidden;
   color: #69768a;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.5;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1757,7 +1758,7 @@ button.table-row:hover {
   background: #111823;
   border-bottom: 1px solid #202a39;
   color: #59667a;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: .6px;
   text-transform: uppercase;
@@ -1766,7 +1767,7 @@ button.table-row:hover {
   min-height: 45px;
   border-bottom: 1px solid #17202d;
   color: #aeb8c8;
-  font-size: 10px;
+  font-size: 12px;
 }
 .logs-row:last-child { border-bottom: 0; }
 .logs-row:hover { background: #0f151e; }
@@ -1776,7 +1777,7 @@ button.table-row:hover {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.logs-row strong { color: #d6dce6; font-size: 10px; }
+.logs-row strong { color: #d6dce6; font-size: 12px; }
 .logs-row span:first-child { color: #59667a; font-family: monospace; }
 
 /* EMPTY STATE */
@@ -1815,7 +1816,7 @@ button.table-row:hover {
 
 @media (max-width: 550px) {
   .topbar { padding: 0 12px; }
-  .brand h1 { font-size: 17px; }
+  .brand h1 { font-size: 18px; }
   .refresh-btn { margin-left: 8px; padding: 7px 9px; }
   .refresh-btn svg { margin-right: 2px; }
   .metrics-grid.compact { grid-template-columns: 1fr; }
@@ -1827,7 +1828,7 @@ button.table-row:hover {
   .response-row { grid-template-columns: 27px minmax(0, 1fr); }
   .response-row .status-badge { grid-column: 2; justify-self: start; }
   .severity-row { grid-template-columns: 75px minmax(0, 1fr) 22px; gap: 8px; }
-  .page-header h2 { font-size: 21px; }
+  .page-header h2 { font-size: 20px; }
 }
 
 
@@ -1847,13 +1848,13 @@ button.table-row:hover {
 
 .ai-context-info h3 {
   margin: 4px 0 5px;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .ai-context-info p {
   margin: 0;
   color: #69768a;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .ai-action-group {
@@ -1871,7 +1872,7 @@ button.table-row:hover {
   gap: 7px;
   padding: 8px 11px;
   border-radius: 7px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -1918,7 +1919,7 @@ button.table-row:hover {
 
 .ai-analysis-header h3 {
   margin: 3px 0 0;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .ai-alert-context {
@@ -1928,7 +1929,7 @@ button.table-row:hover {
   flex-wrap: wrap;
   margin: 14px 0 0;
   color: #778398;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .ai-analysis-grid {
@@ -1953,7 +1954,7 @@ button.table-row:hover {
 .ai-analysis-grid .ai-block p,
 .ai-analysis-grid .ai-block li {
   color: #818d9f;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.65;
 }
 
@@ -1976,7 +1977,7 @@ button.table-row:hover {
   padding-top: 12px;
   border-top: 1px solid #1b2432;
   color: #4f5c70;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .ai-empty-panel {
@@ -1999,7 +2000,7 @@ button.table-row:hover {
   max-width: 430px;
   margin: 0 0 15px;
   color: #667387;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.6;
 }
 
@@ -2015,12 +2016,12 @@ button.table-row:hover {
 
 .ai-loading strong {
   color: #c0c8d5;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .ai-loading span {
   color: #667387;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .ai-missing-panel {
@@ -2029,7 +2030,7 @@ button.table-row:hover {
   gap: 8px;
   margin-top: 15px;
   color: #d5a650;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .ai-summary ol {
@@ -2040,7 +2041,7 @@ button.table-row:hover {
 .ai-summary li {
   margin-bottom: 6px;
   color: #808c9e;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.6;
 }
 
@@ -2077,14 +2078,14 @@ button.table-row:hover {
 .response-control-header h3 {
   margin: 4px 0 6px;
   color: #dce3ed;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .response-control-header p {
   max-width: 680px;
   margin: 0;
   color: #69768a;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.55;
 }
 
@@ -2121,7 +2122,7 @@ button.table-row:hover {
   border-radius: 7px;
   color: #c8d0dd;
   font-family: inherit;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   text-align: left;
   cursor: pointer;
@@ -2228,7 +2229,7 @@ button.table-row:hover {
   padding: 8px 10px;
   border-radius: 6px;
   color: #b2becd;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.4;
   cursor: pointer;
   transition: background-color 0.12s ease, color 0.12s ease;
@@ -2276,7 +2277,7 @@ button.table-row:hover {
   padding: 12px 10px;
   text-align: center;
   color: #55657b;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .response-form-field input {
@@ -2287,7 +2288,7 @@ button.table-row:hover {
   background: #0b1119;
   color: #c8d0dd;
   font-family: inherit;
-  font-size: 11px;
+  font-size: 13px;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -2308,7 +2309,7 @@ button.table-row:hover {
   gap: 7px;
   margin-bottom: 9px;
   color: #a68cf9;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .4px;
@@ -2331,7 +2332,7 @@ button.table-row:hover {
   background: #0d1019;
   color: #858fa1;
   text-align: left;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
   cursor: pointer;
 }
@@ -2367,7 +2368,7 @@ button.table-row:hover {
   display: block;
   margin-bottom: 5px;
   color: #59667a;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .5px;
@@ -2391,7 +2392,7 @@ button.table-row:hover {
   gap: 6px;
   border-radius: 7px;
   font-family: inherit;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -2556,7 +2557,7 @@ button.table-row:hover {
 
 .timeline-header strong {
   display: block;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -2606,7 +2607,7 @@ button.table-row:hover {
   padding: 7px 13px;
   border-radius: 7px;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   background: rgba(30, 41, 59, 0.7);
@@ -2631,7 +2632,7 @@ button.table-row:hover {
   padding: 7px 14px;
   border-radius: 7px;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
@@ -2716,7 +2717,7 @@ button.table-row:hover {
   padding: 6px 14px;
   border-radius: 7px;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   background: #1e1b4b;

@@ -73,7 +73,7 @@
 }
 
 .docs-pill-badge {
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -261,7 +261,7 @@
 }
 
 .docs-category-count {
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   background-color: #1e293b;
   color: #64748b;
   padding: 2px 6px;
@@ -368,7 +368,7 @@
 }
 
 .docs-badge-cat {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -543,7 +543,7 @@
   border: none;
   color: #64748b;
   cursor: pointer;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   padding: 3px 8px;
   border-radius: 4px;
   transition: all 0.15s ease;
@@ -677,7 +677,7 @@
 }
 
 .docs-nav-card-label {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
   color: #64748b;
